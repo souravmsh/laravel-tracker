@@ -1,0 +1,31 @@
+packages/souravmsh/tracker/
+├── src/
+│   ├── Console/
+│   │   ├── Commands/
+│   │   │   ├── InstallCommand.php
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   ├── Middleware/
+│   ├── Models/
+│   ├── Services/
+│   ├── Events/
+│   ├── Listeners/
+│   ├── Jobs/
+│   ├── TrackerServiceProvider.php
+├── config/
+│   ├── tracker.php
+├── database/
+│   ├── tables.php
+│   ├── table2.php
+├── resources/
+│   ├── views/
+│   │   ├── dashboard.blade.php
+│   │   ├── visitors.blade.php
+│   │   ├── list.blade.php
+│   │   ├── components/
+│   ├── assets/
+├── routes/
+│   ├── api.php
+│   ├── web.php
+├── composer.json
+├── README.md

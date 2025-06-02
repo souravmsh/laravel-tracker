@@ -1,0 +1,184 @@
+/* macOS-inspired styles compatible with Bootstrap 5+ */
+.tracker-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+    background-color: #f5f5f7; /* macOS light background */
+    min-height: 100vh;
+    font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.tracker-heading-1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #1d1d1f; /* macOS dark text */
+    margin-bottom: 20px;
+    letter-spacing: -0.022em;
+}
+
+.tracker-heading-2 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #1d1d1f;
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
+}
+
+/* Card styles */
+.tracker-card {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px; /* macOS rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Subtle macOS shadow */
+    margin-bottom: 24px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Form styles */
+.tracker-form-group {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.tracker-form-group input,
+.tracker-form-group select {
+    border: 1px solid #d2d2d7; /* macOS light border */
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.9375rem;
+    background-color: #ffffff;
+    color: #1d1d1f;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.tracker-form-group input:focus,
+.tracker-form-group select:focus {
+    outline: none;
+    border-color: #007aff; /* macOS blue */
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+}
+
+.tracker-form-group button {
+    background-color: #007aff;
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.tracker-form-group button:hover {
+    background-color: #005bb5; /* Darker macOS blue */
+}
+
+/* Table styles */
+.tracker-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.tracker-table th,
+.tracker-table td {
+    border-bottom: 1px solid #e8e8ed; /* Subtle macOS divider */
+    padding: 12px;
+    text-align: left;
+    font-size: 0.875rem;
+    color: #1d1d1f;
+}
+
+.tracker-table th {
+    background-color: #f2f2f7; /* macOS header background */
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    color: #6e6e73;
+}
+
+.tracker-table tr:last-child td {
+    border-bottom: none;
+}
+
+.tracker-table tr:nth-child(even) {
+    background-color: #fafafa; /* Subtle alternating row color */
+}
+
+.tracker-table td.tracker-text-center {
+    text-align: center;
+}
+
+/* Pagination */
+.tracker-pagination {
+    margin-top: 20px;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.tracker-pagination a,
+.tracker-pagination span {
+    padding: 6px 12px;
+    border: 1px solid #d2d2d7;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #007aff;
+    font-size: 0.875rem;
+    background-color: #ffffff;
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.tracker-pagination a:hover {
+    background-color: #007aff;
+    color: #ffffff;
+}
+
+.tracker-pagination .current {
+    background-color: #007aff;
+    color: #ffffff;
+    border-color: #007aff;
+}
+
+/* Chart canvas */
+canvas {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .tracker-container {
+        padding: 16px;
+    }
+
+    .tracker-form-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .tracker-form-group input,
+    .tracker-form-group select,
+    .tracker-form-group button {
+        width: 100%;
+        font-size: 0.875rem;
+    }
+
+    .tracker-table th,
+    .tracker-table td {
+        font-size: 0.8125rem;
+        padding: 10px;
+    }
+}
