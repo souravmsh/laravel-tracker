@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ config('tracker.title', 'TRACKER // ANALYTICS') }}</title>
-    
+
     <!-- Local Assets -->
     <link rel="stylesheet" href="{{ asset('vendor/tracker/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('vendor/tracker/css/bootstrap-icons.min.css') }}">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
             --bg-master: #0b0e14;
@@ -23,9 +24,18 @@
             --accent-orange: #f0883e;
             --text-main: #c9d1d9;
             --text-muted: #8b949e;
+            --text-placeholder: rgba(139, 148, 158, 0.45);
             --sidebar-width: 200px;
             --header-height: 48px;
         }
+
+        .text-main { color: var(--text-main) !important; }
+        .text-muted { color: var(--text-muted) !important; }
+        .text-info { color: var(--accent-cyan) !important; }
+        .text-accent-cyan { color: var(--accent-cyan) !important; }
+        .bg-master { background-color: var(--bg-master) !important; }
+        .bg-panel { background-color: var(--bg-panel) !important; }
+        .bg-card { background-color: var(--bg-card) !important; }
 
         body {
             background-color: var(--bg-master);
@@ -36,7 +46,8 @@
             letter-spacing: -0.01em;
         }
 
-        code, .mono {
+        code,
+        .mono {
             font-family: 'JetBrains Mono', monospace;
         }
 
@@ -198,10 +209,12 @@
             .tracker-main-content .sidebar {
                 transform: translateX(-100%);
             }
+
             .tracker-main-content .main-content {
                 margin-left: 0;
                 padding: 1rem;
             }
+
             .tracker-main-content .sidebar.show {
                 transform: translateX(0);
             }
@@ -241,14 +254,81 @@
             display: block;
         }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg-master); }
-        ::-webkit-scrollbar-thumb { background: var(--border-primary); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+        /* GLOBAL PLACEHOLDER STYLE */
+        .tracker-main-content ::placeholder {
+            color: var(--text-placeholder) !important;
+            opacity: 1;
+        }
+        
+        .tracker-main-content :-ms-input-placeholder {
+            color: var(--text-placeholder) !important;
+        }
+        
+        .tracker-main-content ::-ms-input-placeholder {
+            color: var(--text-placeholder) !important;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-master);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-primary);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+        /* PAGINATION REDESIGN */
+        .tracker-main-content .pagination {
+            gap: 6px;
+        }
+
+        .tracker-main-content .page-item:first-child .page-link,
+        .tracker-main-content .page-item:last-child .page-link {
+            border-radius: 4px;
+        }
+
+        .tracker-main-content .page-link {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-primary);
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 6px 12px;
+            transition: all 0.2s ease;
+            border-radius: 4px;
+        }
+
+        .tracker-main-content .page-link:hover {
+            background-color: rgba(0, 242, 255, 0.05);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .tracker-main-content .page-item.active .page-link {
+            background-color: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+            color: #000;
+        }
+
+        .tracker-main-content .page-item.disabled .page-link {
+            background-color: var(--bg-master);
+            border-color: var(--border-primary);
+            color: #444;
+            opacity: 0.5;
+        }
     </style>
-    
+
     @stack('tracker-styles')
 </head>
+
 <body>
     <div class="tracker-main-content">
         <!-- Mobile Header -->
@@ -301,4 +381,5 @@
     </script>
     @stack('tracker-scripts')
 </body>
+
 </html>

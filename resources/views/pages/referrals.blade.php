@@ -2,85 +2,135 @@
 
 @section('tracker-content')
     <div class="container-fluid">
-    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-3 gap-2">
-        <div>
-            <h1 class="h6 fw-700 text-main mb-0 mono" style="color: var(--accent-cyan)">REFERRAL_SYSTEM</h1>
-            <p class="text-muted small mb-0 mono" style="font-size: 0.65rem">CAMPAIGN_TRACKING_CODES</p>
-        </div>
+        {{-- HEADER --}}
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-2">
+            <div>
+                <h1 class="h5 fw-700 text-main mb-0 mono" style="color: var(--accent-cyan)">REFERRAL_SYSTEM</h1>
+                <p class="text-muted small mb-0 mono" style="font-size: 0.65rem">CAMPAIGN_TRACKING_AND_ATTRIBUTION</p>
+            </div>
 
-        <div class="d-flex align-items-center gap-2">
-            @if (request()->has(['referral_code', 'date_from', 'date_to']))
-                <div class="badge border text-muted fw-500 px-2 py-1 small d-none d-md-block mono" style="border-color: var(--border-primary); border-radius: 2px; font-size: 0.65rem">
-                    {{ request('referral_code') ?: 'ALL' }} // {{ request('date_from') ?: 'START' }}
-                </div>
-            @endif
-            <button class="btn btn-primary d-flex align-items-center gap-1 btn-sm mono" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas" style="font-size: 0.65rem">
-                <i class="bi bi-sliders"></i> <span>FILTERS</span>
-            </button>
-        </div>
-    </div>
-
-        <div class="card border-0 shadow-sm overflow-hidden mb-4">
-            <div class="card-header border-bottom p-2 d-flex justify-content-between align-items-center">
-                <h2 class="chart-title mb-0 mono">ACTIVE_CODES</h2>
-                <button class="btn btn-primary btn-sm px-2 mono" data-bs-toggle="modal" data-bs-target="#trackerRef" data-item='' style="font-size: 0.65rem">
-                    <i class="bi bi-plus-lg me-1"></i> NEW_CODE
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-primary d-flex align-items-center gap-2 btn-sm px-3 py-2 fw-600 mono" type="button"
+                    data-bs-toggle="modal" data-bs-target="#trackerRef" data-item='' style="font-size: 0.7rem; border-radius: 4px;">
+                    <i class="bi bi-plus-lg"></i> <span>NEW_REFERRAL</span>
                 </button>
+                <button class="btn btn-secondary d-flex align-items-center gap-2 btn-sm px-3 py-2 fw-600 mono" type="button"
+                    data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas" style="font-size: 0.7rem; border-radius: 4px;">
+                    <i class="bi bi-sliders"></i> <span>FILTERS</span>
+                </button>
+            </div>
+        </div>
+
+        {{-- STATS ROW --}}
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="card bg-panel border-0 p-3 h-100 shadow-sm" style="border: 1px solid var(--border-primary) !important;">
+                    <small class="text-muted mono mb-1 d-block" style="font-size: 0.6rem;">TOTAL_CODES</small>
+                    <div class="h5 mb-0 fw-700 text-main">{{ $referrals->total() }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card bg-panel border-0 p-3 h-100 shadow-sm" style="border: 1px solid var(--border-primary) !important;">
+                    <small class="text-muted mono mb-1 d-block" style="font-size: 0.6rem;">ACTIVE_STATUS</small>
+                    <div class="h5 mb-0 fw-700 text-success">{{ $referrals->where('status', 1)->count() }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card bg-panel border-0 p-3 h-100 shadow-sm" style="border: 1px solid var(--border-primary) !important;">
+                    <small class="text-muted mono mb-1 d-block" style="font-size: 0.6rem;">TOTAL_VISITS</small>
+                    <div class="h5 mb-0 fw-700 text-info">{{ number_format($referrals->sum('logs_count')) }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card bg-panel border-0 p-3 h-100 shadow-sm" style="border: 1px solid var(--border-primary) !important;">
+                    <small class="text-muted mono mb-1 d-block" style="font-size: 0.6rem;">AVG_CONVERSION</small>
+                    <div class="h5 mb-0 fw-700 text-accent-cyan">
+                        {{ $referrals->total() > 0 ? round($referrals->sum('logs_count') / $referrals->total(), 1) : 0 }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- TABLE CARD --}}
+        <div class="card border-0 shadow-lg overflow-hidden mb-4 bg-panel"
+            style="border: 1px solid var(--border-primary) !important; border-radius: 8px;">
+            <div class="card-header bg-dark border-bottom p-3 d-flex justify-content-between align-items-center"
+                style="border-color: var(--border-primary) !important;">
+                <h2 class="h6 mb-0 fw-700 text-info mono"><i class="bi bi-table me-2"></i>CAMPAIGN_REGISTRY</h2>
+                <div class="text-muted small mono" style="font-size: 0.6rem;">{{ $referrals->count() }} ENTRIES_VIEWED</div>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
-                        <thead>
+                        <thead class="bg-dark bg-opacity-50">
                             <tr>
-                                <th>Code</th>
-                                <th>Campaign</th>
-                                <th class="text-center">Visits</th>
-                                <th class="d-none d-md-table-cell">Timing</th>
-                                <th class="text-end">Actions</th>
+                                <th class="ps-3 py-3 mono small text-muted">IDENTIFIER</th>
+                                <th class="py-3 mono small text-muted">CAMPAIGN_INFO</th>
+                                <th class="text-center py-3 mono small text-muted">ANALYTICS</th>
+                                <th class="d-none d-md-table-cell py-3 mono small text-muted">TIMELINES</th>
+                                <th class="text-end pe-3 py-3 mono small text-muted">ACTIONS</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="border-top-0">
                             @forelse ($referrals as $referral)
                                 <tr>
-                                    <td>
+                                    <td class="ps-3 py-3 align-middle">
                                         <div class="d-flex flex-column">
-                                            <span class="fw-700 text-dark small">{{ $referral->code }}</span>
-                                            <span class="badge {{ $referral->status ? 'text-success' : 'text-secondary' }} p-0 text-uppercase fw-800" style="font-size: 0.6rem;">
-                                                {{ $referral->status ? 'Active' : 'Inactive' }}
-                                            </span>
+                                            <span class="fw-700 text-main" style="letter-spacing: 0.5px;">{{ $referral->code }}</span>
+                                            <div class="mt-1">
+                                                @if($referral->status)
+                                                    <span class="badge border border-success text-success fw-600 bg-success bg-opacity-10" style="font-size: 0.55rem; padding: 2px 6px;">LIVE</span>
+                                                @else
+                                                    <span class="badge border border-secondary text-muted fw-600 bg-secondary bg-opacity-10" style="font-size: 0.55rem; padding: 2px 6px;">PAUSED</span>
+                                                @endif
+                                            </div>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td class="py-3 align-middle">
                                         <div class="d-flex flex-column">
-                                            <span class="fw-600 text-dark small">{{ str($referral->title)->limit(20) }}</span>
-                                            <small class="text-secondary d-none d-sm-block" style="font-size: 0.7rem;">{{ str($referral->description)->limit(30) }}</small>
+                                            <span class="fw-600 small">{{ str($referral->title)->limit(30) }}</span>
+                                            <small class="text-muted d-none d-sm-block mt-1" style="font-size: 0.7rem;">
+                                                {{ $referral->description ?: 'No description provided.' }}
+                                            </small>
                                         </div>
                                     </td>
-                                    <td class="text-center">
-                                        <a href="{{ route('tracker.visitors') }}?referral_code={{ $referral->code }}" class="text-primary fw-700 small text-decoration-none">
-                                            {{ $referral->logs_count }} <i class="bi bi-arrow-right-short"></i>
+                                    <td class="text-center py-3 align-middle">
+                                        <a href="{{ route('tracker.visitors') }}?referral_code={{ $referral->code }}"
+                                            class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded bg-info bg-opacity-10 text-info text-decoration-none border border-info border-opacity-20 hover-scale">
+                                            <span class="fw-700">{{ number_format($referral->logs_count) }}</span>
+                                            <i class="bi bi-bar-chart-fill" style="font-size: 0.7rem;"></i>
                                         </a>
                                     </td>
-                                    <td class="d-none d-md-table-cell">
-                                        <div class="d-flex flex-column">
-                                            <small class="text-dark fw-500" style="font-size: 0.75rem;">Created {{ $referral->created_at->format('M d, Y') }}</small>
+                                    <td class="d-none d-md-table-cell py-3 align-middle">
+                                        <div class="d-flex flex-column gap-1">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <i class="bi bi-calendar-plus text-muted" style="font-size: 0.7rem;"></i>
+                                                <small class="text-muted" style="font-size: 0.7rem;">{{ $referral->created_at->format('M d, Y') }}</small>
+                                            </div>
                                             @if($referral->expires_at)
-                                                <small class="text-danger fw-600" style="font-size: 0.7rem;">Exp. {{ $referral->expires_at->format('M d, Y') }}</small>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <i class="bi bi-hourglass-split text-danger" style="font-size: 0.7rem;"></i>
+                                                    <small class="text-danger fw-600" style="font-size: 0.7rem;">{{ $referral->expires_at->format('M d, Y') }}</small>
+                                                </div>
                                             @endif
                                         </div>
                                     </td>
-                                    <td class="text-end">
-                                        <button class="btn btn-light btn-sm rounded-circle p-1" style="width: 28px; height: 28px;" data-bs-toggle="modal" data-bs-target="#trackerRef" data-item='{{ json_encode($referral) }}'>
-                                            <i class="bi bi-pencil-square" style="font-size: 0.8rem;"></i>
+                                    <td class="text-end pe-3 py-3 align-middle">
+                                        <button class="btn btn-outline-info btn-sm rounded-circle p-0 d-inline-flex align-items-center justify-content-center"
+                                            style="width: 32px; height: 32px;"
+                                            data-bs-toggle="modal" data-bs-target="#trackerRef"
+                                            data-item='{{ json_encode($referral) }}'>
+                                            <i class="bi bi-pencil-square"></i>
                                         </button>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center py-4">
+                                    <td colspan="5" class="text-center py-5">
                                         <div class="p-3">
-                                            <i class="bi bi-link-45deg fs-2 text-secondary opacity-25 d-block mb-2"></i>
-                                            <p class="text-secondary small mb-0">No codes found.</p>
+                                            <i class="bi bi-database-dash fs-1 text-muted opacity-25 d-block mb-3"></i>
+                                            <h3 class="h6 text-muted fw-600">No Referral Records</h3>
+                                            <p class="text-muted small mb-0">Start by creating a new campaign code above.</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -88,7 +138,8 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-3 p-3">
+                {{-- PAGINATION --}}
+                <div class="p-3 border-top" style="border-color: var(--border-primary) !important;">
                     @if (!empty($referrals->count()))
                         {!! $referrals->appends(request()->all())->links('pagination::bootstrap-5') !!}
                     @endif
@@ -97,50 +148,80 @@
         </div>
     </div>
 
+    {{-- MODAL --}}
     <div class="modal fade" id="trackerRef" tabindex="-1" aria-labelledby="trackerRefLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; overflow: hidden;">
+            <div class="modal-content border-0 shadow-lg bg-panel" style="border-radius: 12px; overflow: hidden; border: 1px solid var(--border-primary) !important;">
                 <form method="POST" class="referralForm" id="referralForm" action="{{ route('tracker.referrals.store') }}">
                     @csrf
                     <input type="hidden" name="id" id="referralId">
-                    <div class="modal-header bg-dark text-white border-0 p-4">
-                        <h1 class="modal-title h5 fw-700 mb-0" id="trackerRefLabel">Create Referral</h1>
+                    <div class="modal-header bg-dark text-main border-bottom p-3" style="border-color: var(--border-primary) !important;">
+                        <h1 class="modal-title h6 fw-700 mb-0 mono" id="trackerRefLabel" style="color: var(--accent-cyan); letter-spacing: 1px;">CREATE_REFERRAL</h1>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body p-4">
+                    <div class="modal-body p-4 bg-panel">
                         <div class="row g-4">
                             <div class="col-sm-12">
-                                <label for="code" class="form-label fw-600 text-secondary small">REFERRAL CODE</label>
-                                <input type="text" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" id="code" name="code" placeholder="e.g. SUMMER25">
+                                <div class="form-group">
+                                    <label for="code" class="form-label fw-600 small mono mb-2" style="font-size: 0.65rem; opacity: 0.8;">IDENTIFIER_CODE</label>
+                                    <input type="text" class="form-control bg-dark text-main border-secondary py-2 px-3 mono shadow-none" 
+                                        style="border-color: var(--border-primary) !important; border-radius: 6px; font-size: 0.8rem;" 
+                                        id="code" name="code" placeholder="e.g. SUMMER2025" required>
+                                </div>
                             </div>
                             <div class="col-sm-12">
-                                <label for="title" class="form-label fw-600 text-secondary small">TITLE</label>
-                                <input type="text" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" id="title" name="title" placeholder="Campaign Name">
+                                <div class="form-group">
+                                    <label for="title" class="form-label fw-600 small mono mb-2" style="font-size: 0.65rem; opacity: 0.8;">CAMPAIGN_TITLE</label>
+                                    <input type="text" class="form-control bg-dark text-main border-secondary py-2 px-3 mono shadow-none" 
+                                        style="border-color: var(--border-primary) !important; border-radius: 6px; font-size: 0.8rem;" 
+                                        id="title" name="title" placeholder="Marketing Campaign X" required>
+                                </div>
                             </div>
                             <div class="col-sm-12">
-                                <label for="description" class="form-label fw-600 text-secondary small">DESCRIPTION</label>
-                                <textarea class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" id="description" name="description" rows="3" placeholder="Notes about this campaign..."></textarea>
+                                <div class="form-group">
+                                    <label for="description" class="form-label fw-600 small mono mb-2" style="font-size: 0.65rem; opacity: 0.8;">CAMPAIGN_DETAILS</label>
+                                    <textarea class="form-control bg-dark text-main border-secondary py-2 px-3 mono shadow-none" 
+                                        style="border-color: var(--border-primary) !important; border-radius: 6px; font-size: 0.8rem;" 
+                                        id="description" name="description" rows="3" placeholder="Enter notes or campaign description..."></textarea>
+                                </div>
                             </div>
                             <div class="col-sm-6">
-                                <label for="status" class="form-label fw-600 text-secondary small">STATUS</label>
-                                <select class="form-select bg-light border-0 py-2 px-3" style="border-radius: 12px;" id="status" name="status">
-                                    <option value="1">Active</option>
-                                    <option value="0">Inactive</option>
-                                </select>
+                                <div class="form-group">
+                                    <label for="status" class="form-label fw-600 small mono mb-2" style="font-size: 0.65rem; opacity: 0.8;">OPERATIONAL_STATUS</label>
+                                    <select class="form-select bg-dark text-main border-secondary py-2 px-3 mono shadow-none" 
+                                        style="border-color: var(--border-primary) !important; border-radius: 6px; font-size: 0.8rem;" 
+                                        id="status" name="status">
+                                        <option value="1">ACTIVE</option>
+                                        <option value="0">PAUSED</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="col-sm-6">
-                                <label for="position" class="form-label fw-600 text-secondary small">POSITION</label>
-                                <input type="number" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" id="position" name="position" min="0" value="0">
+                                <div class="form-group">
+                                    <label for="position" class="form-label fw-600 small mono mb-2" style="font-size: 0.65rem; opacity: 0.8;">DISPLAY_PRIORITY</label>
+                                    <input type="number" class="form-control bg-dark text-main border-secondary py-2 px-3 mono shadow-none" 
+                                        style="border-color: var(--border-primary) !important; border-radius: 6px; font-size: 0.8rem;" 
+                                        id="position" name="position" min="0" value="0">
+                                </div>
                             </div>
                             <div class="col-sm-12">
-                                <label for="expires_at" class="form-label fw-600 text-secondary small">EXPIRES AT (OPTIONAL)</label>
-                                <input type="datetime-local" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" id="expires_at" name="expires_at">
+                                <div class="form-group">
+                                    <label for="expires_at" class="form-label fw-600 small mono mb-2" style="font-size: 0.65rem; opacity: 0.8;">TERMINATION_TIMESTAMP</label>
+                                    <input type="datetime-local" class="form-control bg-dark text-main border-secondary py-2 px-3 mono shadow-none" 
+                                        style="border-color: var(--border-primary) !important; border-radius: 6px; font-size: 0.8rem;" 
+                                        id="expires_at" name="expires_at">
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer border-0 p-4 pt-0">
-                        <button type="button" class="btn btn-light fw-600 px-4" style="border-radius: 12px;" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary fw-600 px-4" style="border-radius: 12px;">Save Changes</button>
+                    <div class="modal-footer border-top bg-dark p-3 d-flex gap-2" style="border-color: var(--border-primary) !important;">
+                        <button type="button" class="btn btn-outline-secondary fw-700 px-4 py-2 mono shadow-none" 
+                            style="border-radius: 4px; font-size: 0.7rem; border-color: var(--border-primary) !important; color: var(--text-muted);" 
+                            data-bs-dismiss="modal">TERMINATE_OP</button>
+                        <button type="submit" class="btn btn-primary fw-700 px-4 py-2 mono shadow-none" 
+                            style="border-radius: 4px; font-size: 0.7rem; background-color: var(--accent-cyan) !important; border: none; color: #000;">
+                            SAVE_ENTITY
+                        </button>
                     </div>
                 </form>
             </div>
@@ -149,6 +230,11 @@
 @endsection
 
 @push('tracker-scripts')
+<style>
+    .hover-scale { transition: transform 0.2s; }
+    .hover-scale:hover { transform: scale(1.05); }
+    .table-hover tbody tr:hover { background-color: rgba(255,255,255,0.02) !important; }
+</style>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const modal = document.getElementById('trackerRef');
@@ -168,7 +254,7 @@
             }
 
             if (item && item.id) {
-                modalTitle.textContent = 'Edit Referral';
+                modalTitle.textContent = 'EDIT_REFERRAL';
                 referralId.value = item.id || '';
                 document.getElementById('code').value = item.code || '';
                 document.getElementById('title').value = item.title || '';
@@ -178,8 +264,7 @@
                 document.getElementById('expires_at').value = item.expires_at ? 
                     new Date(item.expires_at).toISOString().slice(0, 16) : '';
             } else {
-                // Create mode
-                modalTitle.textContent = 'Create Referral';
+                modalTitle.textContent = 'CREATE_REFERRAL';
                 form.reset();
                 referralId.value = '';
                 document.getElementById('status').value = '1';
@@ -191,12 +276,11 @@
             event.preventDefault();
             
             const formData = new FormData(form);
-            const method   = form.method || 'POST';
             const url      = form.action;
 
             try {
                 const response = await fetch(url, {
-                    method: method,
+                    method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
                         'Accept': 'application/json'
@@ -205,7 +289,6 @@
                 });
                 const data = await response.json();
                 if (data.success) {
-                    alert(`Referral ${referralId ? 'updated' : 'created'} successfully!`);
                     window.location.reload();
                 } else {
                     alert(`Error: ${data.message || 'Something went wrong'}`);

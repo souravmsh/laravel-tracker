@@ -35,7 +35,7 @@ class TrackerMiddleware
         if (!empty($allowedPaths) && !$request->is($allowedPaths)) {
             return $next($request);
         }
-        
+
         if (config("tracker.enabled", true)) {
             $this->trackerMiddlewareService->track($request);
         }

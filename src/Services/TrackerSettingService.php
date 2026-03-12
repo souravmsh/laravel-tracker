@@ -3,7 +3,6 @@
 namespace Souravmsh\LaravelTracker\Services;
 
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Exception;
 use Souravmsh\LaravelTracker\Models\TrackerSetting;
@@ -122,7 +121,7 @@ class TrackerSettingService
                 'ip_api_enabled'   => 'tracker.analytics.ip_api.enabled',
                 'ip_api_token'     => 'tracker.analytics.ip_api.token',
                 'ga_enabled'       => 'tracker.analytics.google.enabled',
-                'ga_measurement_id'=> 'tracker.analytics.google.measurement_id',
+                'ga_measurement_id' => 'tracker.analytics.google.measurement_id',
                 'ga_api_secret'    => 'tracker.analytics.google.api_secret',
                 'ga_event_name'    => 'tracker.analytics.google.event_name',
                 'referral_code_params' => 'tracker.referral_code_params',

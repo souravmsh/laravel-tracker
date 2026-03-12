@@ -40,48 +40,48 @@
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center gap-2">
-                                        <div class="bg-light rounded-circle text-center" style="width: 32px; height: 32px; line-height: 32px; font-size: 0.8rem;">
+                                        <div class="bg-master bg-opacity-50 rounded-circle text-center border" style="width: 32px; height: 32px; line-height: 32px; font-size: 0.8rem; border-color: var(--border-primary) !important;">
                                             {!! $visitor->country_flag ?: '<i class="bi bi-globe"></i>' !!}
                                         </div>
                                         <div>
-                                            <span class="d-block fw-600 text-dark small">
-                                                {!! ($visitor->country_geo ? ("<a href='https://www.google.com/maps?q={$visitor->country_geo}' target='_blank' class='text-decoration-none'>{$visitor->ip_address}</a>") : $visitor->ip_address) !!}
+                                            <span class="d-block fw-600 text-info small">
+                                                {!! ($visitor->country_geo ? ("<a href='https://www.google.com/maps?q={$visitor->country_geo}' target='_blank' class='text-decoration-none text-info'>{$visitor->ip_address}</a>") : $visitor->ip_address) !!}
                                             </span>
-                                            <small class="text-secondary d-lg-none" style="font-size: 0.7rem;">{{ $visitor->country_name ?: 'Unknown' }}</small>
+                                            <small class="text-muted d-lg-none" style="font-size: 0.7rem;">{{ $visitor->country_name ?: 'Unknown' }}</small>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="d-none d-lg-table-cell">
-                                    <small class="text-secondary">{{ $visitor->country_name ?: 'Unknown' }}</small>
+                                    <small class="text-muted">{{ $visitor->country_name ?: 'Unknown' }}</small>
                                 </td>
                                 <td>
-                                    <small class="d-block text-primary fw-600" title="{{ $visitor->visit_url }}">{{ str($visitor->visit_url)->limit(25) }}</small>
+                                    <small class="d-block text-info fw-600" title="{{ $visitor->visit_url }}">{{ str($visitor->visit_url)->limit(30) }}</small>
                                     @if($visitor->referral_url)
-                                        <small class="text-secondary d-none d-md-block" style="font-size: 0.7rem;" title="{{ $visitor->referral_url }}">via {{ str($visitor->referral_url)->limit(20) }}</small>
+                                        <small class="text-muted d-none d-md-block" style="font-size: 0.7rem;" title="{{ $visitor->referral_url }}">via {{ str($visitor->referral_url)->limit(30) }}</small>
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1 rounded-pill fw-700" style="font-size: 0.75rem;">
+                                    <span class="badge bg-info bg-opacity-10 text-info px-2 py-1 rounded-pill fw-700" style="font-size: 0.75rem;">
                                         {{ $visitor->visits ?? 1 }}
                                     </span>
                                 </td>
                                 <td class="d-none d-md-table-cell">
                                     <div class="d-flex flex-column">
-                                        <span class="fw-600 text-dark small">{{ $visitor->referral_code ?: 'Direct' }}</span>
-                                        <small class="text-secondary" style="font-size: 0.7rem;">{{ $visitor->utm_source ?: '-' }}</small>
+                                        <span class="fw-600 text-muted small">{{ $visitor->referral_code ?: 'Direct' }}</span>
+                                        <small class="text-muted" style="font-size: 0.7rem;">{{ $visitor->utm_source ?: '-' }}</small>
                                     </div>
                                 </td>
                                 <td class="text-end">
-                                    <span class="text-dark fw-500 small d-block">{{ $visitor->created_at->diffForHumans(null, true) }}</span>
-                                    <small class="text-secondary" style="font-size: 0.65rem;">{{ $visitor->created_at->format('M d, H:i') }}</small>
+                                    <span class="text-info fw-500 small d-block">{{ $visitor->created_at->diffForHumans(null, true) }}</span>
+                                    <small class="text-muted" style="font-size: 0.65rem;">{{ $visitor->created_at->format('M d, H:i') }}</small>
                                 </td>
                             </tr>
                         @empty
                             <tr>
                                 <td colspan="6" class="text-center py-4">
                                     <div class="p-3">
-                                        <i class="bi bi-mailbox fs-2 text-secondary opacity-25 d-block mb-2"></i>
-                                        <p class="text-secondary small mb-0">No visitors found.</p>
+                                        <i class="bi bi-mailbox fs-2 text-muted opacity-25 d-block mb-2"></i>
+                                        <p class="text-muted small mb-0">No visitors found.</p>
                                     </div>
                                 </td>
                             </tr>

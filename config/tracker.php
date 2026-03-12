@@ -10,8 +10,8 @@
  */
 
 return [
-    'enabled'         => env('TRACKER_ENABLED', true),
-    'title'           => env('APP_NAME', 'TRACKER').' // ANALYTICS',
+    'enabled'         => env('TRACKER_ENABLED', false),
+    'title'           => env('APP_NAME', 'TRACKER') . ' // ANALYTICS',
 
     /*
     |--------------------------------------------------------------------------
@@ -62,7 +62,13 @@ return [
     |--------------------------------------------------------------------------
     | If not empty, only requests matching these patterns will be tracked.
     */
-    'allowed_paths' => [],
+    'allowed_paths' => [
+        '/',
+        'auth/',
+        'auth/*',
+        'home',
+        'page/*',
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -73,8 +79,8 @@ return [
     'queue_enabled'   => false,
     'log_to_database' => true,
     'rate_limit'      => 300,
-    'session_lifetime'=> 1440,
-    'max_input_length'=> 255,
+    'session_lifetime' => 1440,
+    'max_input_length' => 255,
     'layout'          => 'tracker::app',
     'cache_ttl'       => env('TRACKER_CACHE_TTL', 300), // TTL in seconds (0 to disable)
     'analytics' => [

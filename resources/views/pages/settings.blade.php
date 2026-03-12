@@ -12,7 +12,7 @@
 
     @if(session('success'))
     <div class="alert border-0 mb-4 d-flex align-items-center gap-2 px-3 py-2 small"
-        style="background: rgba(16,185,129,0.10); color: #065f46; border-radius: 8px;">
+        style="background: rgba(16,185,129,0.15); color: #34d399; border-radius: 8px; border: 1px solid rgba(16,185,129,0.2) !important;">
         <i class="bi bi-check-circle-fill text-success"></i>
         <span class="fw-600">{{ session('success') }}</span>
     </div>
@@ -27,13 +27,13 @@
             <div class="col-12">
                 <div class="card p-3">
                     <div class="d-flex align-items-center gap-2 mb-3">
-                        <span class="rounded bg-primary bg-opacity-10 d-flex align-items-center justify-content-center"
-                            style="width:32px;height:32px;">
-                            <i class="bi bi-toggles2 text-primary"></i>
+                        <span class="rounded bg-info bg-opacity-20 d-flex align-items-center justify-content-center"
+                            style="width:32px;height:32px; border: 1px solid rgba(0, 242, 255, 0.2) !important;">
+                            <i class="bi bi-toggles2 text-info"></i>
                         </span>
                         <div>
-                            <h5 class="fw-700 h6 mb-0">General</h5>
-                            <small class="text-secondary" style="font-size: 0.75rem;">Core tracking behaviour</small>
+                            <h5 class="fw-700 h6 mb-0 text-info">General</h5>
+                            <small class="text-muted" style="font-size: 0.75rem;">Core tracking behaviour</small>
                         </div>
                     </div>
 
@@ -44,10 +44,10 @@
                         @if(isset($g[$bkey]))
                         @php $s = $g[$bkey] @endphp
                         <div class="col-md-6">
-                            <div class="d-flex align-items-center justify-content-between p-2 rounded border bg-light bg-opacity-50">
+                            <div class="d-flex align-items-center justify-content-between p-2 rounded border bg-master bg-opacity-50" style="border-color: var(--border-primary) !important;">
                                 <div>
-                                    <div class="fw-600 text-dark small">{{ $s['label'] }}</div>
-                                    <small class="text-secondary" style="font-size: 0.7rem;">{{ str($s['description'])->limit(50) }}</small>
+                                    <div class="fw-600 text-main small">{{ $s['label'] }}</div>
+                                    <small class="text-muted" style="font-size: 0.7rem;">{{ str($s['description'])->limit(50) }}</small>
                                 </div>
                                 <div class="form-check form-switch mb-0">
                                     <input class="form-check-input" type="checkbox"
@@ -88,13 +88,13 @@
             <div class="col-12">
                 <div class="card p-3">
                     <div class="d-flex align-items-center gap-2 mb-3">
-                        <span class="rounded bg-primary bg-opacity-10 d-flex align-items-center justify-content-center"
-                            style="width:32px;height:32px;">
-                            <i class="bi bi-geo-alt text-primary"></i>
+                        <span class="rounded bg-info bg-opacity-20 d-flex align-items-center justify-content-center"
+                            style="width:32px;height:32px; border: 1px solid rgba(0, 242, 255, 0.2) !important;">
+                            <i class="bi bi-geo-alt text-info"></i>
                         </span>
                         <div>
-                            <h5 class="fw-700 h6 mb-0">IP Geolocation</h5>
-                            <small class="text-secondary" style="font-size: 0.75rem;">Powered by <a href="https://ipapi.co" target="_blank" class="text-primary text-decoration-none">ipapi.co</a></small>
+                            <h5 class="fw-700 h6 mb-0 text-info">IP Geolocation</h5>
+                            <small class="text-muted" style="font-size: 0.75rem;">Powered by <a href="https://ipapi.co" target="_blank" class="text-info text-decoration-none fw-600">ipapi.co</a></small>
                         </div>
                     </div>
 
@@ -103,10 +103,10 @@
                         @if(isset($ip['ip_api_enabled']))
                         @php $s = $ip['ip_api_enabled'] @endphp
                         <div class="col-md-6">
-                            <div class="d-flex align-items-center justify-content-between p-2 rounded border bg-light bg-opacity-50">
+                            <div class="d-flex align-items-center justify-content-between p-2 rounded border bg-master bg-opacity-50" style="border-color: var(--border-primary) !important;">
                                 <div>
-                                    <div class="fw-600 text-dark small">{{ $s['label'] }}</div>
-                                    <small class="text-secondary" style="font-size: 0.7rem;">{{ str($s['description'])->limit(50) }}</small>
+                                    <div class="fw-600 text-main small">{{ $s['label'] }}</div>
+                                    <small class="text-muted" style="font-size: 0.7rem;">{{ str($s['description'])->limit(50) }}</small>
                                 </div>
                                 <div class="form-check form-switch mb-0">
                                     <input class="form-check-input" type="checkbox"
@@ -121,9 +121,9 @@
                         @if(isset($ip['ip_api_token']))
                         @php $s = $ip['ip_api_token'] @endphp
                         <div class="col-md-6">
-                            <label class="form-label fw-600 small text-dark mb-1">{{ $s['label'] }}</label>
-                            <input type="password" class="form-control form-control-sm" name="ip_api_token"
-                                value="{{ $s['value'] }}" autocomplete="off">
+                            <label class="form-label fw-600 small text-main mb-1 mono" style="font-size: 0.65rem">API_TOKEN</label>
+                            <input type="password" class="form-control form-control-sm bg-dark text-main border-secondary mono" name="ip_api_token"
+                                value="{{ $s['value'] }}" autocomplete="off" style="font-size: 0.75rem;">
                         </div>
                         @endif
                     </div>
@@ -134,13 +134,13 @@
             <div class="col-12">
                 <div class="card p-3">
                     <div class="d-flex align-items-center gap-2 mb-3">
-                        <span class="rounded bg-danger bg-opacity-10 d-flex align-items-center justify-content-center"
-                            style="width:32px;height:32px;">
+                        <span class="rounded bg-danger bg-opacity-20 d-flex align-items-center justify-content-center"
+                            style="width:32px;height:32px; border: 1px solid rgba(220, 53, 69, 0.2) !important;">
                             <i class="bi bi-bar-chart-line text-danger"></i>
                         </span>
                         <div>
-                            <h5 class="fw-700 h6 mb-0">Google Analytics 4</h5>
-                            <small class="text-secondary" style="font-size: 0.75rem;">Measurement Protocol</small>
+                                <h5 class="fw-700 h6 mb-0 text-info">Google Analytics 4</h5>
+                                <small class="text-muted" style="font-size: 0.75rem;">Measurement Protocol</small>
                         </div>
                     </div>
 
@@ -152,8 +152,8 @@
                             <div class="d-flex align-items-center justify-content-between p-2 rounded border"
                                 style="background: rgba(234,67,53,0.03); border-color: rgba(234,67,53,0.1) !important;">
                                 <div>
-                                    <div class="fw-600 text-dark small">{{ $s['label'] }}</div>
-                                    <small class="text-secondary" style="font-size: 0.7rem;">{{ str($s['description'])->limit(60) }}</small>
+                                    <div class="fw-600 text-main small">{{ $s['label'] }}</div>
+                                    <small class="text-muted" style="font-size: 0.7rem;">{{ str($s['description'])->limit(60) }}</small>
                                 </div>
                                 <div class="form-check form-switch mb-0">
                                     <input class="form-check-input" type="checkbox"
@@ -169,11 +169,11 @@
                         @if(isset($ga[$gakey]))
                         @php $s = $ga[$gakey] @endphp
                         <div class="col-md-4">
-                            <label class="form-label fw-600 small text-dark mb-1">{{ $s['label'] }}</label>
+                            <label class="form-label fw-600 small text-main mb-1 mono" style="font-size: 0.65rem">{{ strtoupper(str_replace(' ', '_', $s['label'])) }}</label>
                             <input type="{{ $gakey === 'ga_api_secret' ? 'password' : 'text' }}"
-                                class="form-control form-control-sm" name="{{ $gakey }}"
+                                class="form-control form-control-sm bg-dark text-main border-secondary mono" name="{{ $gakey }}"
                                 value="{{ $s['value'] }}" autocomplete="off"
-                                placeholder="{{ $gakey === 'ga_measurement_id' ? 'G-XXXXXXXXXX' : '' }}">
+                                placeholder="{{ $gakey === 'ga_measurement_id' ? 'G-XXXXXXXXXX' : '' }}" style="font-size: 0.75rem;">
                         </div>
                         @endif
                         @endforeach
@@ -185,13 +185,13 @@
             <div class="col-12">
                 <div class="card p-3">
                     <div class="d-flex align-items-center gap-2 mb-3">
-                        <span class="rounded bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center"
-                            style="width:32px;height:32px;">
-                            <i class="bi bi-code-slash text-secondary"></i>
+                        <span class="rounded bg-secondary bg-opacity-20 d-flex align-items-center justify-content-center"
+                            style="width:32px;height:32px; border: 1px solid rgba(139, 148, 158, 0.2) !important;">
+                            <i class="bi bi-code-slash text-muted"></i>
                         </span>
                         <div>
-                            <h5 class="fw-700 h6 mb-0">Advanced & Layout</h5>
-                            <small class="text-secondary" style="font-size: 0.75rem;">Path filtering and view options</small>
+                                <h5 class="fw-700 h6 mb-0 text-info">Advanced & Layout</h5>
+                                <small class="text-muted" style="font-size: 0.75rem;">Path filtering and view options</small>
                         </div>
                     </div>
 
@@ -199,22 +199,22 @@
                         <div class="col-md-4">
                             @if(isset($g['referral_code_params']))
                             @php $s = $g['referral_code_params'] @endphp
-                            <label class="form-label fw-600 small text-dark mb-1">{{ $s['label'] }}</label>
-                            <textarea class="form-control form-control-sm" name="referral_code_params" rows="2" style="font-size: 0.75rem;">{{ is_array($s['value']) ? json_encode($s['value']) : $s['value'] }}</textarea>
+                            <label class="form-label fw-600 small text-main mb-1 mono" style="font-size: 0.65rem">{{ strtoupper(str_replace(' ', '_', $s['label'])) }}</label>
+                            <textarea class="form-control form-control-sm bg-dark text-main border-secondary mono" name="referral_code_params" rows="2" style="font-size: 0.75rem;">{{ is_array($s['value']) ? json_encode($s['value']) : $s['value'] }}</textarea>
                             @endif
                         </div>
                         <div class="col-md-4">
                             @if(isset($g['ignore_paths']))
                             @php $s = $g['ignore_paths'] @endphp
-                            <label class="form-label fw-600 small text-dark mb-1">{{ $s['label'] }}</label>
-                            <textarea class="form-control form-control-sm" name="ignore_paths" rows="2" style="font-size: 0.75rem;">{{ is_array($s['value']) ? json_encode($s['value']) : $s['value'] }}</textarea>
+                            <label class="form-label fw-600 small text-main mb-1 mono" style="font-size: 0.65rem">{{ strtoupper(str_replace(' ', '_', $s['label'])) }}</label>
+                            <textarea class="form-control form-control-sm bg-dark text-main border-secondary mono" name="ignore_paths" rows="2" style="font-size: 0.75rem;">{{ is_array($s['value']) ? json_encode($s['value']) : $s['value'] }}</textarea>
                             @endif
                         </div>
                         <div class="col-md-4">
                             @if(isset($g['allowed_paths']))
                             @php $s = $g['allowed_paths'] @endphp
-                            <label class="form-label fw-600 small text-dark mb-1">{{ $s['label'] }}</label>
-                            <textarea class="form-control form-control-sm" name="allowed_paths" rows="2" style="font-size: 0.75rem;">{{ is_array($s['value']) ? json_encode($s['value']) : $s['value'] }}</textarea>
+                            <label class="form-label fw-600 small text-main mb-1 mono" style="font-size: 0.65rem">{{ strtoupper(str_replace(' ', '_', $s['label'])) }}</label>
+                            <textarea class="form-control form-control-sm bg-dark text-main border-secondary mono" name="allowed_paths" rows="2" style="font-size: 0.75rem;">{{ is_array($s['value']) ? json_encode($s['value']) : $s['value'] }}</textarea>
                             @endif
                         </div>
                         <div class="col-md-6">
