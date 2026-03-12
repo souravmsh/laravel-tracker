@@ -56,7 +56,7 @@ A robust Laravel package for tracking referrals and visitors with advanced analy
    ```env
    TRACKER_TRACKING_ENABLED=true
    TRACKER_QUEUE_ENABLED=true
-   TRACKER_LOG_TO_DATABASE=true
+   TRACKER_LOG_STORE_INTO_DATABASE=true
    TRACKER_RATE_LIMIT=5
    TRACKER_SESSION_LIFETIME=1440
    TRACKER_GOOGLE_ANALYTICS=false
@@ -186,7 +186,7 @@ Event::listen(function (TrackerEvent $event) {
 The configuration file (`config/referral.php`) allows customization of:
 
 - `enabled`: Enable/disable referral tracking.
-- `log_to_database`: Log referrals to the database.
+- `log_store_into_database`: Log referrals to the database.
 - `rate_limit`: Maximum tracking requests per IP per minute.
 - `session_lifetime`: Session duration for tracking (minutes).
 - `cookie_l

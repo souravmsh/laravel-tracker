@@ -7,123 +7,98 @@ use Illuminate\Support\Facades\Artisan;
 
 class InstallCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = "tracker:install";
+    protected $signature   = 'tracker:install {--force : Skip all confirmations}';
+    protected $description = 'Install the Laravel Tracker package — publish assets and run migrations';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = "Install the LaravelTracker package by publishing assets and running migrations";
-
-    /**
-     * Execute the console command.
-     *
-     * @return int
-     */
-    public function handle()
+    public function handle(): int
     {
-        $this->info("Installing LaravelTracker package...");
+        $this->newLine();
+        $this->line('  <fg=cyan;options=bold>🚀 Laravel Tracker — Install</>');
+        $this->newLine();
 
-        // Publish configuration
-        if (
-            $this->confirm(
-                "Do you want to publish the configuration files?",
-                false
-            )
-        ) {
-            $this->info("Publishing configuration...");
-            Artisan::call("vendor:publish", [
-                "--tag" => "tracker-config",
-                "--provider" =>
-                    "Souravmsh\LaravelTracker\TrackerServiceProvider",
-                "--force" => true,
+        $force = $this->option('force');
+
+        // ── Publish config ────────────────────────────────────────────────────
+        if ($force || $this->confirm('  Publish configuration file?', false)) {
+            Artisan::call('vendor:publish', [
+                '--tag'      => 'tracker-config',
+                '--provider' => 'Souravmsh\\LaravelTracker\\TrackerServiceProvider',
+                '--force'    => true,
             ]);
-            $this->comment(Artisan::output());
+            $this->line('  <fg=green>✓</> Published: <fg=cyan>config/tracker.php</>');
         } else {
-            $this->comment("Skipped publishing configuration.");
+            $this->line('  <fg=gray>– Skipped config publish.</>');
         }
 
-        // Publish migrations
-        if (
-            $this->confirm(
-                "Do you want to publish the migration files?",
-                default: false
-            )
-        ) {
-            $this->info("Publishing migrations...");
-            Artisan::call("vendor:publish", [
-                "--tag" => "tracker-migrations",
-                "--provider" =>
-                    "Souravmsh\LaravelTracker\TrackerServiceProvider",
-                "--force" => true,
+        // ── Publish migrations ────────────────────────────────────────────────
+        if ($force || $this->confirm('  Publish migration files?', false)) {
+            Artisan::call('vendor:publish', [
+                '--tag'      => 'tracker-migrations',
+                '--provider' => 'Souravmsh\\LaravelTracker\\TrackerServiceProvider',
+                '--force'    => true,
             ]);
-            $this->comment(Artisan::output());
+            $this->line('  <fg=green>✓</> Published: <fg=cyan>database/migrations</>');
         } else {
-            $this->comment("Skipped publishing migrations.");
+            $this->line('  <fg=gray>– Skipped migrations publish.</>');
         }
 
-        // Publish views
-        if ($this->confirm("Do you want to publish the view files?", false)) {
-            $this->info("Publishing views...");
-            Artisan::call("vendor:publish", [
-                "--tag" => "tracker-views",
-                "--provider" =>
-                    "Souravmsh\LaravelTracker\TrackerServiceProvider",
-                "--force" => true,
+        // ── Publish views ─────────────────────────────────────────────────────
+        if ($force || $this->confirm('  Publish view files?', false)) {
+            Artisan::call('vendor:publish', [
+                '--tag'      => 'tracker-views',
+                '--provider' => 'Souravmsh\\LaravelTracker\\TrackerServiceProvider',
+                '--force'    => true,
             ]);
-            $this->comment(Artisan::output());
+            $this->line('  <fg=green>✓</> Published: <fg=cyan>resources/views/vendor/tracker</>');
         } else {
-            $this->comment("Skipped publishing views.");
+            $this->line('  <fg=gray>– Skipped views publish.</>');
         }
 
-        // Publish assets (commented out in original code, keeping it commented)
-        if ($this->confirm("Do you want to publish the asset files?", true)) {
-            $this->info("Publishing assets...");
-            Artisan::call("vendor:publish", [
-                "--tag" => "tracker-assets",
-                "--provider" =>
-                    "Souravmsh\LaravelTracker\TrackerServiceProvider",
-                "--force" => true,
+        // ── Publish assets ────────────────────────────────────────────────────
+        if ($force || $this->confirm('  Publish asset files?', true)) {
+            Artisan::call('vendor:publish', [
+                '--tag'      => 'tracker-assets',
+                '--provider' => 'Souravmsh\\LaravelTracker\\TrackerServiceProvider',
+                '--force'    => true,
             ]);
-            $this->comment(Artisan::output());
+            $this->line('  <fg=green>✓</> Published: <fg=cyan>public/vendor/tracker</>');
         } else {
-            $this->comment("Skipped publishing assets.");
+            $this->line('  <fg=gray>– Skipped assets publish.</>');
         }
 
-        // Run migrations without asking
-        $this->info("Running migrations...");
+        // ── Run migrations ────────────────────────────────────────────────────
+        $this->newLine();
+        $this->line('  <fg=cyan>Running migrations…</>');
         try {
-            Artisan::call("migrate", [
-                "--path" =>
-                    "vendor/souravmsh/laravel-tracker/database/migrations",
+            Artisan::call('migrate', [
+                '--path'  => 'vendor/souravmsh/laravel-tracker/database/migrations',
+                '--force' => true,
             ]);
-            $this->comment(Artisan::output());
+            $output = trim(Artisan::output());
+            if ($output) {
+                $this->line($output);
+            }
+            $this->line('  <fg=green>✓</> Migrations completed.');
         } catch (\Exception $e) {
-            $this->error("Migration failed: " . $e->getMessage());
-            $this->warn(
-                "Please ensure your database connection is configured correctly in .env"
-            );
-            return 1;
+            $this->error('  Migration failed: ' . $e->getMessage());
+            $this->line('  <fg=yellow>Ensure your DB connection is configured in .env</>');
+            return self::FAILURE;
         }
 
-        // Provide post-installation instructions
-        $this->info("LaravelTracker package installed successfully!");
-        $this->comment("Next steps:");
-        $this->comment(
-            "- Add environment variables to .env (see config/referral.php for options)."
-        );
-        $this->comment("- Access the dashboard at /tracker/dashboard.");
-        $this->comment(
-            "- Use the API at /api/tracker/referrals or /api/tracker/visitors."
-        );
-        $this->comment("For more details, see the README.md file.");
+        // ── Done ──────────────────────────────────────────────────────────────
+        $this->newLine();
+        $this->line('  <fg=green;options=bold>✅ Laravel Tracker installed successfully!</>');
+        $this->newLine();
+        $this->table(['Resource', 'URL'], [
+            ['Dashboard', url('tracker/dashboard')],
+            ['Visitors',  url('tracker/visitors')],
+            ['Referrals', url('tracker/referrals')],
+            ['Settings',  url('tracker/settings')],
+        ]);
+        $this->newLine();
+        $this->line('  <fg=gray>Tip: run <fg=cyan>php artisan tracker:help</> to see all available commands.</>');
+        $this->newLine();
 
-        return 0;
+        return self::SUCCESS;
     }
 }

@@ -6,15 +6,18 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Souravmsh\LaravelTracker\Models\TrackerReferral;
 use Souravmsh\LaravelTracker\Services\TrackerDataService;
+use Souravmsh\LaravelTracker\Services\TrackerSettingService;
 
 class TrackerWebController extends Controller
 {
     protected $view = "tracker::pages.";
     private $trackerDataService;
+    private $settingService;
 
-    public function __construct(TrackerDataService $trackerDataService) 
+    public function __construct(TrackerDataService $trackerDataService, TrackerSettingService $settingService)
     {
         $this->trackerDataService = $trackerDataService;
+        $this->settingService     = $settingService;
     }
 
     public function dashboard(Request $request)
@@ -87,5 +90,50 @@ class TrackerWebController extends Controller
         }
 
         return response()->json(['success' => true, 'referral' => $request->all()], 200);
+    }
+
+    /**
+     * Show the settings management page.
+     */
+    public function settings()
+    {
+        $settings = $this->settingService->grouped();
+        return view($this->view . 'settings', compact('settings'));
+    }
+
+    /**
+     * Save updated settings and flush cache.
+     */
+    public function saveSettings(Request $request)
+    {
+        $allowed = [
+            'enabled', 'debug', 'queue_enabled', 'log_to_database',
+            'rate_limit', 'session_lifetime', 'max_input_length',
+            'ip_api_enabled', 'ip_api_token',
+            'ga_enabled', 'ga_measurement_id', 'ga_api_secret', 'ga_event_name',
+            'referral_code_params', 'ignore_paths', 'allowed_paths',
+        ];
+
+        $data = [];
+        foreach ($allowed as $key) {
+            // Checkboxes: unchecked = not present in request; treat as 0
+            if (in_array($key, ['enabled', 'debug', 'queue_enabled', 'log_to_database', 'ip_api_enabled', 'ga_enabled'])) {
+                $data[$key] = $request->has($key) ? '1' : '0';
+            } else if (in_array($key, ['referral_code_params', 'ignore_paths', 'allowed_paths'])) {
+                $val = $request->input($key);
+                if ($val && !str_starts_with(trim($val), '[')) {
+                    // Convert comma separated to JSON
+                    $data[$key] = json_encode(array_map('trim', explode(',', $val)));
+                } else {
+                    $data[$key] = $val;
+                }
+            } else {
+                $data[$key] = $request->input($key);
+            }
+        }
+
+        $this->settingService->saveMany($data);
+
+        return redirect()->route('tracker.settings')->with('success', 'Settings saved successfully.');
     }
 }

@@ -23,10 +23,6 @@ class GoogleAnalyticsService
     {
         $this->measurementId = config('tracker.analytics.google.measurement_id');
         $this->apiSecret     = config('tracker.analytics.google.api_secret');
-
-        if (!$this->measurementId || !$this->apiSecret) {
-            throw new Exception('Google Analytics configuration is missing.');
-        }
     }
 
     /**
@@ -40,149 +36,58 @@ class GoogleAnalyticsService
     }
 
     /**
-     * Send custom event to Google Analytics
+     * Send custom event to Google Analytics (GA4 Measurement Protocol)
      */
-    public function track(array $params = [], ?string $eventName = null): bool
+    public function track(array $data = [], ?string $eventName = null): bool
     {
         try {
-            // Use provided event name or fallback to 'page_view'
-            $eventName = $eventName ?? 'page_view';
+            if (!$this->measurementId || !$this->apiSecret) {
+                if (config("tracker.debug", false)) {
+                    Log::warning('[LaravelTracker] GoogleAnalytics@track - Missing Measurement ID or API Secret');
+                }
+                return false;
+            }
 
-            // Generate client_id for this event
-            $clientId = $this->generateClientId();
+            // Use provided event name, fallback to config, or default to 'page_view'
+            $eventName = $eventName ?? config('tracker.analytics.google.event_name') ?? 'page_view';
+            
+            // Use visitor_id as client_id for consistent tracking across sessions
+            $clientId = $data['visitor_id'] ?? $this->generateClientId();
 
             $payload = [
                 'client_id' => $clientId,
                 'events' => [
                     [
                         'name' => $eventName,
-                        'params' => $params
+                        'params' => array_merge($data, [
+                            'engagement_time_msec' => 1,
+                            'session_id' => $data['session_id'] ?? null,
+                        ])
                     ]
                 ]
             ];
 
-            // Add query parameters to the POST request
-            $response = Http::withQueryParameters([
+            $response = \Illuminate\Support\Facades\Http::withQueryParameters([
                 'measurement_id' => $this->measurementId,
                 'api_secret'     => $this->apiSecret
             ])->post('https://www.google-analytics.com/mp/collect', $payload);
 
             if (config("tracker.debug", false)) {
-                Log::debug('[LaravelTracker]GoogleAnalytics@track - Sent GA event', [
+                \Illuminate\Support\Facades\Log::debug('[LaravelTracker] GoogleAnalytics@track - Sent GA event', [
                     'measurement_id' => $this->measurementId,
                     'event_name'     => $eventName,
                     'client_id'      => $clientId,
-                    'params'         => $params,
+                    'status'         => $response->status(),
                     'response'       => $response->body(),
                 ]);
             }
 
-            return $response->status() === 204;
-        } catch (Exception $e) {
-            Log::error('[LaravelTracker]GoogleAnalytics@track - Failed to send GA event: ' . $e->getMessage());
+            return $response->successful();
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('[LaravelTracker] GoogleAnalytics@track - Failed to send GA event: ' . $e->getMessage());
             return false;
         }
     }
-
-    /**
-     * Initialize Google Analytics Reporting API client
-     */
-    protected function initializeAnalyticsReporting()
-    {
-        try {
-            $client = new Google_Client();
-            $client->setApplicationName(env('APP_NAME', 'Your Laravel App')); // Get app name from .env
-            $client->setScopes([Google_Service_AnalyticsReporting::ANALYTICS_READONLY]);
-            $client->setAuthConfig(config('tracker.analytics.google.credentials_path'));
-            $this->analytics = new Google_Service_AnalyticsReporting($client);
-        } catch (Exception $e) {
-            Log::error('Failed to initialize Google Analytics: ' . $e->getMessage());
-            throw $e;
-        }
-    }
-
-    /**
-     * Get page views for dashboard
-     */
-    public function getPageViews(string $startDate = '7daysAgo', string $endDate = 'today'): array
-    {
-        try {
-            $cacheKey = 'ga_page_views_' . md5($startDate . $endDate);
-
-            return Cache::remember($cacheKey, now()->addHours(1), function () use ($startDate, $endDate) {
-                $this->initializeAnalyticsReporting(); // Ensure analytics is initialized
-
-                $dateRange = new Google_Service_AnalyticsReporting_DateRange();
-                $dateRange->setStartDate($startDate);
-                $dateRange->setEndDate($endDate);
-
-                $pageViews = new Google_Service_AnalyticsReporting_Metric();
-                $pageViews->setExpression('ga:pageviews');
-                $pageViews->setAlias('pageviews');
-
-                $pagePath = new Google_Service_AnalyticsReporting_Dimension();
-                $pagePath->setName('ga:pagePath');
-
-                $request = new Google_Service_AnalyticsReporting_ReportRequest();
-                $request->setViewId(config('tracker.analytics.google.view_id'));
-                $request->setDateRanges([$dateRange]);
-                $request->setMetrics([$pageViews]);
-                $request->setDimensions([$pagePath]);
-
-                $body = new Google_Service_AnalyticsReporting_GetReportsRequest();
-                $body->setReportRequests([$request]);
-
-                $reports = $this->analytics->reports->batchGet($body);
-                $data = [];
-
-                foreach ($reports->getReports()[0]->getData()->getRows() as $row) {
-                    $data[] = [
-                        'page' => $row->getDimensions()[0],
-                        'views' => $row->getMetrics()[0]->getValues()[0]
-                    ];
-                }
-
-                return $data;
-            });
-        } catch (Exception $e) {
-            Log::error('Failed to fetch page views: ' . $e->getMessage());
-            return [];
-        }
-    }
-
-    /**
-     * Get active users for dashboard
-     */
-    public function getActiveUsers(string $startDate = '7daysAgo', string $endDate = 'today'): int
-    {
-        try {
-            $cacheKey = 'ga_active_users_' . md5($startDate . $endDate);
-
-            return Cache::remember($cacheKey, now()->addHours(1), function () use ($startDate, $endDate) {
-                $this->initializeAnalyticsReporting(); // Ensure analytics is initialized
-
-                $dateRange = new Google_Service_AnalyticsReporting_DateRange();
-                $dateRange->setStartDate($startDate);
-                $dateRange->setEndDate($endDate);
-
-                $activeUsers = new Google_Service_AnalyticsReporting_Metric();
-                $activeUsers->setExpression('ga:users');
-                $activeUsers->setAlias('active_users');
-
-                $request = new Google_Service_AnalyticsReporting_ReportRequest();
-                $request->setViewId(config('tracker.analytics.google.view_id'));
-                $request->setDateRanges([$dateRange]);
-                $request->setMetrics([$activeUsers]);
-
-                $body = new Google_Service_AnalyticsReporting_GetReportsRequest();
-                $body->setReportRequests([$request]);
-
-                $reports = $this->analytics->reports->batchGet($body);
-                return (int) $reports->getReports()[0]->getData()->getTotals()[0]->getValues()[0];
-            });
-        } catch (Exception $e) {
-            Log::error('Failed to fetch active users: ' . $e->getMessage());
-            return 0;
-        }
-    }
 }
+
+

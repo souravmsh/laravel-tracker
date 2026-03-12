@@ -167,22 +167,27 @@ class IPApiService
     protected function updateTrackerRecord($trackerData, $countryData)
     {
         try {
-            $trackerId = $trackerData["visitor_id"] ?? null;
+            $visitorId = $trackerData["visitor_id"] ?? null;
+            $sessionId = $trackerData["session_id"] ?? null;
 
-            if ($trackerId && $countryData) {
-                TrackerLog::where("visitor_id", $trackerId)->update([
-                    "ip_address"   => $countryData["ip_address"],
-                    "country_name" => $countryData["country_name"],
-                    "country_code" => $countryData["country_code"],
-                    "country_flag" => $countryData["country_flag"],
-                    "country_geo" => $countryData["country_geo"],
-                    "address" => $countryData["address"],
-                ]);
+            if ($visitorId && $sessionId && $countryData) {
+                TrackerLog::where("visitor_id", $visitorId)
+                    ->where("session_id", $sessionId)
+                    ->where("country_name", "Unknown") // Only update rows not yet geocoded
+                    ->update([
+                        "ip_address"   => $countryData["ip_address"],
+                        "country_name" => $countryData["country_name"],
+                        "country_code" => $countryData["country_code"],
+                        "country_flag" => $countryData["country_flag"],
+                        "country_geo"  => $countryData["country_geo"],
+                        "address"      => $countryData["address"],
+                    ]);
             }
         } catch (Exception $e) {
-            Log::error("[LaravelTracker]AnalyticService@track - Failed to update tracker record", [
-                "tracker_id" => $trackerId,
-                "error" => $e->getMessage(),
+            Log::error("[LaravelTracker] IpApiService@updateTrackerRecord - Failed to update tracker record", [
+                "visitor_id" => $visitorId ?? "unknown",
+                "session_id" => $sessionId ?? "unknown",
+                "error"      => $e->getMessage(),
             ]);
         }
     }

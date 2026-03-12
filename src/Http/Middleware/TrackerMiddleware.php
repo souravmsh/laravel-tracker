@@ -19,8 +19,20 @@ class TrackerMiddleware
 
     public function handle(Request $request, Closure $next)
     {
-        // Skip non-HTML and asset requests
-        if ($request->expectsJson() || !$request->acceptsHtml() || $request->isXmlHttpRequest() || $request->isMethod("post") || $request->is($this->ignorePaths)) {
+        $allowedPaths = config("tracker.allowed_paths", []);
+
+        // Basic exclusions
+        if ($request->expectsJson() || !$request->acceptsHtml() || $request->isXmlHttpRequest() || $request->isMethod("post")) {
+            return $next($request);
+        }
+
+        // Check ignored paths
+        if ($request->is($this->ignorePaths)) {
+            return $next($request);
+        }
+
+        // Check allowed paths (if defined)
+        if (!empty($allowedPaths) && !$request->is($allowedPaths)) {
             return $next($request);
         }
         

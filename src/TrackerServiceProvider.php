@@ -5,8 +5,13 @@ namespace Souravmsh\LaravelTracker;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Http\Kernel;
 use Souravmsh\LaravelTracker\Console\Commands\InstallCommand;
+use Souravmsh\LaravelTracker\Console\Commands\UninstallCommand;
+use Souravmsh\LaravelTracker\Console\Commands\HelpCommand;
+use Souravmsh\LaravelTracker\Console\Commands\EnableCommand;
+use Souravmsh\LaravelTracker\Console\Commands\DisableCommand;
 use Souravmsh\LaravelTracker\Http\Middleware\TrackerMiddleware;
 use Souravmsh\LaravelTracker\Services\TrackerMiddlewareService;
+use Souravmsh\LaravelTracker\Services\TrackerSettingService;
 use Souravmsh\LaravelTracker\Events\IpApiEvent;
 use Souravmsh\LaravelTracker\Listeners\IpApiListener;
 use Souravmsh\LaravelTracker\Events\GoogleAnalyticsEvent;
@@ -17,8 +22,13 @@ class TrackerServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__ . "/../config/tracker.php", "tracker");
+
         $this->app->singleton(TrackerMiddlewareService::class, function ($app) {
             return new TrackerMiddlewareService();
+        });
+
+        $this->app->singleton(TrackerSettingService::class, function ($app) {
+            return new TrackerSettingService();
         });
     }
 
@@ -69,6 +79,9 @@ class TrackerServiceProvider extends ServiceProvider
         // Load views
         $this->loadViewsFrom(__DIR__ . "/../resources/views", "tracker");
 
+        // Merge DB settings into config (silently skips if table doesn't exist yet)
+        $this->app->make(TrackerSettingService::class)->mergeIntoConfig();
+
         // Register event listener
         $this->app["events"]->listen(IpApiEvent::class, IpApiListener::class);
         $this->app["events"]->listen(GoogleAnalyticsEvent::class, GoogleAnalyticsListener::class);
@@ -85,9 +98,15 @@ class TrackerServiceProvider extends ServiceProvider
         // direct push to middleware
         $kernel->pushMiddleware(TrackerMiddleware::class);
 
-        // Register console command
+        // Register console commands
         if ($this->app->runningInConsole()) {
-            $this->commands([InstallCommand::class]);
+            $this->commands([
+                InstallCommand::class,
+                UninstallCommand::class,
+                HelpCommand::class,
+                EnableCommand::class,
+                DisableCommand::class,
+            ]);
         }
     }
 }

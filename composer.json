@@ -1,25 +1,25 @@
 {
     "name": "souravmsh/laravel-tracker",
     "description": "A Laravel package for tracking visitor referrals and logging visitor data",
+    "type": "laravel-package",
+    "version": "1.0",
     "keywords": [
         "laravel",
         "tracker",
         "visitor-logs",
         "referral-tracking",
-        "souravmsh"
+        "analytics"
     ],
     "homepage": "https://github.com/souravmsh/laravel-tracker",
     "license": "MIT",
     "authors": [
         {
             "name": "Shohrab Hossain",
-            "email": "sourav.diubd@gmail.com",
-            "role": "Developer"
+            "email": "sourav.diubd@gmail.com"
         }
     ],
     "require": {
         "php": "^8.1",
-        "laravel/framework": "^9.0|^10.0|^11.0",
         "illuminate/support": "^9.0|^10.0|^11.0",
         "google/apiclient": "^2.0"
     },
@@ -37,10 +37,6 @@
             "Souravmsh\\LaravelTracker\\Tests\\": "tests/"
         }
     },
-    "config": {
-        "sort-packages": true,
-        "optimize-autoloader": true
-    },
     "extra": {
         "laravel": {
             "providers": [
@@ -49,10 +45,15 @@
             "aliases": {
                 "LaravelTracker": "Souravmsh\\LaravelTracker\\Facades\\LaravelTracker"
             }
+        },
+        "branch-alias": {
+            "dev-main": "1.0-dev"
         }
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true
+    },
     "scripts": {
         "test": "vendor/bin/phpunit",
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage"

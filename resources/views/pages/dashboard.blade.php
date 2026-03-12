@@ -3,26 +3,21 @@
 @section('tracker-content')
 <div class="container-fluid"> 
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="display-5 mb-4 fw-bold text-dark">Dashboard</h1>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+        <div>
+            <h1 class="display-6 fw-800 text-dark mb-1" style="letter-spacing: -1.5px;">Dashboard</h1>
+            <p class="text-secondary fw-500 mb-0">Overview of your traffic and referrals</p>
+        </div>
 
-        <div class="btn-group">
+        <div class="d-flex align-items-center gap-2">
             @if(request()->has(['referral_code', 'date_from', 'date_to']))
-            <div class="btn btn-info" data-bs-toggle="dropdown" aria-expanded="false">
-                <span class="fw-400">
-                    {{ request('referral_code') ? 'Referral: ' . request('referral_code') : 'All Referrals' }}
-                </span>
-                <span class="mx-2">|</span>
-                <span class="fw-400">
-                    Date: 
-                    {{ request('date_from') ?: 'All Time' }}
-                    &ndash;
-                    {{ request('date_to') ?: 'Present' }}
-                </span>
-            </div>
+                <div class="badge bg-white border text-dark px-3 py-2 d-flex align-items-center gap-2" style="border-radius: 10px; font-weight: 500;">
+                    <i class="bi bi-info-circle text-primary"></i>
+                    {{ request('referral_code') ?: 'All Referrals' }} | {{ request('date_from') ?: 'All Time' }} - {{ request('date_to') ?: 'Present' }}
+                </div>
             @endif
-            <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas">
-                <i class="bi bi-filter"></i> Filters
+            <button class="btn btn-primary d-flex align-items-center gap-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas">
+                <i class="bi bi-sliders"></i> <span>Filters</span>
             </button>
         </div>
     </div>
@@ -32,27 +27,55 @@
         
         <div class="row g-4">
             <div class="col-md-6 col-lg-3">
-                <div class="counter-box">
-                    <h3>{{ $totalVisitors ?? 0 }}</h3>
-                    <p>Total Visitors</p>
+                <div class="counter-box shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h3>{{ $totalVisitors ?? 0 }}</h3>
+                            <p>Total Visitors</p>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-2 rounded-3">
+                            <i class="bi bi-eye text-primary fs-4"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-md-6 col-lg-3">
-                <div class="counter-box">
-                    <h3>{{ $uniqueVisitors ?? 0 }}</h3>
-                    <p>Unique Visitors</p>
+                <div class="counter-box shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h3>{{ $uniqueVisitors ?? 0 }}</h3>
+                            <p>Unique Visitors</p>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-2 rounded-3">
+                            <i class="bi bi-person-check text-success fs-4"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-md-6 col-lg-3">
-                <div class="counter-box">
-                    <h3>{{ $totalRerferral ?? 0 }}</h3>
-                    <p>Total Referrals</p>
+                <div class="counter-box shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h3>{{ $totalRerferral ?? 0 }}</h3>
+                            <p>Active Referrals</p>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-2 rounded-3">
+                            <i class="bi bi-link-45deg text-warning fs-4"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-md-6 col-lg-3">
-                <div class="counter-box">
-                    <h3>{{ $totalUniqueSource ?? 0 }}</h3>
-                    <p>Total Unique Sources</p>
+                <div class="counter-box shadow-sm">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h3>{{ $totalUniqueSource ?? 0 }}</h3>
+                            <p>Unique Sources</p>
+                        </div>
+                        <div class="bg-info bg-opacity-10 p-2 rounded-3">
+                            <i class="bi bi-share text-info fs-4"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -62,7 +85,9 @@
                 <div class="card">
                     <div class="card-body">
                         <h2 class="chart-title">Performance (Last 30 Days)</h2>
-                        <canvas id="last30DaysChart" height="100"></canvas>
+                        <div style="height: 300px; position: relative;">
+                            <canvas id="last30DaysChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -148,7 +173,9 @@
             <div class="card">
                 <div class="card-body">
                     <h2 class="chart-title">Visitor Trends by Medium</h2>
-                    <canvas id="mediumTrendChart" height="100"></canvas>
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="mediumTrendChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -157,7 +184,9 @@
             <div class="card">
                 <div class="card-body">
                     <h2 class="chart-title">Visitor Distribution by Source</h2>
-                    <canvas id="sourcePieChart" height="100"></canvas>
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="sourcePieChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -171,7 +200,9 @@
                 <div class="card">
                     <div class="card-body">
                         <h2 class="chart-title">Performance by Referral Codes</h2>
-                        <canvas id="uniqueVisitorChart" height="100"></canvas>
+                        <div style="height: 300px; position: relative;">
+                            <canvas id="uniqueVisitorChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -180,7 +211,9 @@
                 <div class="card">
                     <div class="card-body">
                         <h2 class="chart-title">Campaign Performance</h2>
-                        <canvas id="campaignBarChart" height="100"></canvas>
+                        <div style="height: 300px; position: relative;">
+                            <canvas id="campaignBarChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -196,6 +229,13 @@
 document.addEventListener('DOMContentLoaded', function () {
     const chartConfigs = [];
 
+    // Common Chart Defaults
+    Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+    Chart.defaults.color = '#64748b';
+    Chart.defaults.plugins.tooltip.backgroundColor = '#1e1b4b';
+    Chart.defaults.plugins.tooltip.padding = 12;
+    Chart.defaults.plugins.tooltip.cornerRadius = 8;
+
     // Unique Visitor Chart (Bar)
     chartConfigs.push({
         ctx: 'uniqueVisitorChart',
@@ -207,32 +247,22 @@ document.addEventListener('DOMContentLoaded', function () {
                     {
                         label: 'Total Visits',
                         data: @json($uniqueVisitorChart['visits']),
-                        backgroundColor: 'rgba(75, 192, 192, 0.5)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
+                        backgroundColor: '#6366f1',
+                        borderRadius: 6,
                     },
                     {
                         label: 'Unique Visitors',
                         data: @json($uniqueVisitorChart['unique_visitors']),
-                        backgroundColor: 'rgba(255, 159, 64, 0.5)',
-                        borderColor: 'rgba(255, 159, 64, 1)',
-                        borderWidth: 1
+                        backgroundColor: '#f43f5e',
+                        borderRadius: 6,
                     }
                 ]
             },
             options: {
                 responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: { display: true, text: 'Count' }
-                    },
-                    x: {
-                        title: { display: true, text: 'Referral Codes' }
-                    }
-                },
+                maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: true, position: 'top' }
+                    legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 6 } }
                 }
             }
         }
@@ -247,32 +277,37 @@ document.addEventListener('DOMContentLoaded', function () {
                 labels: @json($last30DaysChart['labels']),
                 datasets: [
                     {
-                        label: 'Total Page Hits',
+                        label: 'Page Hits',
                         data: @json($last30DaysChart['total_count']),
-                        backgroundColor: 'rgba(0, 123, 255, 0.2)',
-                        borderColor: 'rgba(0, 123, 255, 1)',
-                        borderWidth: 1,
-                        fill: true
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 0,
                     },
                     {
-                        label: 'Total Unique Hits',
+                        label: 'Unique Hits',
                         data: @json($last30DaysChart['unique_count']),
-                        backgroundColor: 'rgba(40, 167, 69, 0.2)',
-                        borderColor: 'rgba(40, 167, 69, 1)',
-                        borderWidth: 1,
-                        fill: true
+                        borderColor: '#10b981',
+                        backgroundColor: 'transparent',
+                        fill: false,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        borderDash: [5, 5]
                     }
                 ]
             },
             options: {
                 responsive: true,
-                scales: {
-                    x: { title: { display: true, text: 'Date' }},
-                    y: { title: { display: true, text: 'Count' }, beginAtZero: true }
-                },
+                maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: true, position: 'top' },
-                    title: { display: true, text: 'Total Page Hits (Last 30 Days)' }
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { border: { dash: [4, 4] }, grid: { color: '#f1f5f9' } }
                 }
             }
         }
@@ -285,33 +320,19 @@ document.addEventListener('DOMContentLoaded', function () {
             type: 'doughnut',
             data: {
                 labels: @json($sourceChart['labels']),
-                datasets: [
-                    {
-                        label: 'Visitors by Source',
-                        data: @json($sourceChart['counts']),
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.5)',
-                            'rgba(54, 162, 235, 0.5)',
-                            'rgba(255, 206, 86, 0.5)',
-                            'rgba(75, 192, 192, 0.5)',
-                            'rgba(153, 102, 255, 0.5)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)'
-                        ],
-                        borderWidth: 1
-                    }
-                ]
+                datasets: [{
+                    data: @json($sourceChart['counts']),
+                    backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6'],
+                    borderWidth: 0,
+                    hoverOffset: 20
+                }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
                 plugins: {
-                    legend: { display: true, position: 'top' },
-                    title: { display: true, text: 'Visitor Distribution by UTM Source' }
+                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
                 }
             }
         }
@@ -327,22 +348,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 datasets: @json($mediumTrendChart['datasets']).map((dataset, index) => ({
                     label: dataset.label,
                     data: dataset.data,
-                    backgroundColor: `rgba(${(index * 50) % 255}, ${(100 + index * 50) % 255}, ${(200 - index * 30) % 255}, 0.2)`,
-                    borderColor: `rgba(${(index * 50) % 255}, ${(100 + index * 50) % 255}, ${(200 - index * 30) % 255}, 1)`,
-                    borderWidth: 1
+                    borderColor: ['#6366f1', '#10b981', '#f59e0b'][index % 3],
+                    backgroundColor: ['rgba(99, 102, 241, 0.1)', 'rgba(16, 185, 129, 0.1)'][index % 2],
+                    borderWidth: 2,
+                    pointRadius: 3
                 }))
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: true, position: 'top' },
-                    title: { display: true, text: 'Visitor Distribution by UTM Medium' }
+                    legend: { position: 'bottom' }
                 },
                 scales: {
-                    r: {
-                        beginAtZero: true,
-                        ticks: { stepSize: 1 }
-                    }
+                    r: { ticks: { display: false }, grid: { color: '#f1f5f9' } }
                 }
             }
         }
@@ -356,19 +375,18 @@ document.addEventListener('DOMContentLoaded', function () {
             data: {
                 labels: @json($campaignChart['labels']),
                 datasets: [{
-                    label: 'All Campaign',
+                    label: 'Visits',
                     data: @json($campaignChart['visits']),
-                    borderWidth: 1
+                    backgroundColor: '#6366f1',
+                    borderRadius: 8
                 }]
             },
             options: {
                 responsive: true,
-                scales: {
-                    x: { title: { display: true, text: 'Campaign' }},
-                    y: { title: { display: true, text: 'Total Visits' }, beginAtZero: true }
-                },
+                maintainAspectRatio: false,
+                indexAxis: 'y',
                 plugins: {
-                    legend: { display: true, position: 'top' },
+                    legend: { display: false }
                 }
             }
         }
