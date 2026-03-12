@@ -3,153 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tracker Dashboard</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <title>{{ config('tracker.title', 'TRACKER // ANALYTICS') }}</title>
+    
+    <!-- Local Assets -->
+    <link rel="stylesheet" href="{{ asset('vendor/tracker/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/tracker/css/bootstrap-icons.min.css') }}">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #64748b;
-            --accent: #f43f5e;
-            --bg-body: #f8fafc;
-            --sidebar-bg: #1e1b4b;
-            --card-glass: rgba(255, 255, 255, 0.7);
-            --card-border: rgba(226, 232, 240, 0.8);
+            --bg-master: #0b0e14;
+            --bg-panel: #151921;
+            --bg-card: #1c2128;
+            --border-primary: #30363d;
+            --accent-cyan: #00f2ff;
+            --accent-orange: #f0883e;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --sidebar-width: 200px;
+            --header-height: 48px;
         }
 
         body {
-            background-color: var(--bg-body);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            color: #1e293b;
+            background-color: var(--bg-master);
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            color: var(--text-main);
             overflow-x: hidden;
+            font-size: 0.85rem;
+            letter-spacing: -0.01em;
+        }
+
+        code, .mono {
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .tracker-main-content .sidebar {
             min-height: 100vh;
-            background: var(--sidebar-bg);
-            color: white;
+            background: var(--bg-panel);
+            border-right: 1px solid var(--border-primary);
+            color: var(--text-main);
             position: fixed;
-            width: 260px;
+            width: var(--sidebar-width);
             top: 0;
             left: 0;
-            padding: 2rem 1.5rem;
+            padding: 1rem 0.75rem;
             z-index: 1000;
-            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.2s ease;
+        }
+
+        .tracker-main-content .sidebar-header {
+            padding: 0 0.5rem 1.5rem;
+            border-bottom: 1px solid var(--border-primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .tracker-main-content .sidebar-header h2 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            color: var(--accent-cyan);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .tracker-main-content .sidebar .nav-link {
-            color: #94a3b8;
-            padding: 0.875rem 1.25rem;
-            border-radius: 12px;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
             display: flex;
             align-items: center;
-            gap: 12px;
-            transition: all 0.2s ease;
-        }
-
-        .tracker-main-content .sidebar .nav-link i {
-            font-size: 1.25rem;
+            gap: 10px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+            transition: all 0.15s ease;
+            position: relative;
         }
 
         .tracker-main-content .sidebar .nav-link:hover {
-            color: white;
-            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.03);
         }
 
         .tracker-main-content .sidebar .nav-link.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 8px 16px -4px rgba(99, 102, 241, 0.4);
+            background: rgba(0, 242, 255, 0.08);
+            color: var(--accent-cyan);
+            border-left: 2px solid var(--accent-cyan);
         }
 
         .tracker-main-content .main-content {
-            margin-left: 260px;
-            padding: 2.5rem;
-            transition: margin-left 0.3s ease;
+            margin-left: var(--sidebar-width);
+            padding: 1.25rem;
+            transition: margin-left 0.2s ease;
         }
 
         .tracker-main-content .card {
-            background: var(--card-glass);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            box-shadow: 0 4px 20px -1px rgba(0, 0, 0, 0.03);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: 4px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 1.25rem;
         }
 
-        .tracker-main-content .card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.08);
+        .tracker-main-content .card-header {
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--border-primary);
+            padding: 0.75rem 1rem;
         }
 
         .tracker-main-content .counter-box {
-            background: white;
-            border-radius: 20px;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid var(--card-border);
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: 4px;
+            padding: 1rem;
             position: relative;
             overflow: hidden;
         }
 
         .tracker-main-content .counter-box h3 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #0f172a;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
             margin-bottom: 0.25rem;
-            letter-spacing: -1px;
         }
 
         .tracker-main-content .counter-box p {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--secondary);
-            margin: 0;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.05rem;
+            margin: 0;
         }
 
         .tracker-main-content .chart-title {
-            font-size: 1.125rem;
+            font-size: 0.8rem;
             font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            color: var(--text-main);
+            letter-spacing: 0.05rem;
         }
 
         .tracker-main-content .btn-primary {
-            background: var(--primary);
+            background: var(--accent-cyan);
             border: none;
-            padding: 0.625rem 1.25rem;
-            border-radius: 12px;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+            color: #000;
+            padding: 0.4rem 0.8rem;
+            border-radius: 2px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+        }
+
+        .tracker-main-content .btn-primary:hover {
+            background: #00d4df;
+            color: #000;
         }
 
         .tracker-main-content .table thead th {
-            background: #f1f5f9;
-            color: #475569;
-            font-weight: 600;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-muted);
+            font-weight: 700;
             text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 1px;
-            padding: 1.25rem 1.5rem;
-            border: none;
+            font-size: 0.65rem;
+            letter-spacing: 0.05rem;
+            padding: 0.6rem 0.75rem;
+            border-bottom: 1px solid var(--border-primary);
         }
 
         .tracker-main-content .table tbody td {
-            padding: 1.25rem 1.5rem;
-            vertical-align: middle;
-            color: #334155;
-            border-bottom: 1px solid #f1f5f9;
+            padding: 0.6rem 0.75rem;
+            font-size: 0.75rem;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--border-primary);
+            background: transparent;
+        }
+
+        .tracker-main-content .table-hover tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-main);
         }
 
         @media (max-width: 992px) {
@@ -158,23 +200,21 @@
             }
             .tracker-main-content .main-content {
                 margin-left: 0;
-                padding: 1.5rem;
+                padding: 1rem;
             }
             .tracker-main-content .sidebar.show {
                 transform: translateX(0);
             }
         }
 
-        /* Mobile Header Styles */
         .mobile-header {
             display: none;
-            background: var(--sidebar-bg);
-            color: white;
-            padding: 1rem 1.5rem;
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border-primary);
+            padding: 0.5rem 1rem;
             position: sticky;
             top: 0;
             z-index: 1100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         @media (max-width: 992px) {
@@ -192,7 +232,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(15, 23, 42, 0.4);
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(4px);
             z-index: 999;
         }
@@ -200,6 +240,11 @@
         .sidebar-overlay.active {
             display: block;
         }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-master); }
+        ::-webkit-scrollbar-thumb { background: var(--border-primary); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
     </style>
     
     @stack('tracker-styles')
@@ -209,10 +254,10 @@
         <!-- Mobile Header -->
         <div class="mobile-header">
             <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-graph-up-arrow text-primary fs-4"></i>
-                <span class="fw-700 h5 mb-0">Tracker</span>
+                <i class="bi bi-robot text-accent-cyan fs-4"></i>
+                <span class="fw-700 h6 mb-0 mono" style="color: var(--accent-cyan)">TRACKER_OS</span>
             </div>
-            <button class="btn btn-outline-light border-0 px-2" id="sidebarToggle">
+            <button class="btn border-0 text-main" id="sidebarToggle">
                 <i class="bi bi-list fs-3"></i>
             </button>
         </div>
@@ -233,7 +278,8 @@
 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Local Scripts -->
+    <script src="{{ asset('vendor/tracker/js/bootstrap.bundle.min.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const sidebar = document.querySelector('.sidebar');

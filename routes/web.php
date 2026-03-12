@@ -3,7 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Souravmsh\LaravelTracker\Http\Controllers\TrackerWebController;
 
-Route::prefix("tracker")
+Route::prefix(config("tracker.routes.prefix", "tracker"))
+    ->middleware(config("tracker.routes.middleware", ["web", "tracker"]))
     ->name("tracker.")
     ->group(function () {
         Route::get("/", [TrackerWebController::class, "dashboard"])->name("dashboard");

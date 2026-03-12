@@ -1,129 +1,110 @@
-@extends("tracker::app")
+@extends(config('tracker.layout', 'tracker::app'))
 
 @section('tracker-content')
-<div class="container-fluid"> 
+<div class="container-fluid px-2"> 
 
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-3 gap-2">
         <div>
-            <h1 class="display-6 fw-800 text-dark mb-1" style="letter-spacing: -1.5px;">Dashboard</h1>
-            <p class="text-secondary fw-500 mb-0">Overview of your traffic and referrals</p>
+            <h1 class="h6 fw-700 text-main mb-0 mono" style="color: var(--accent-cyan)">SYSTEM_OVERVIEW</h1>
+            <p class="text-muted small mb-0 mono" style="font-size: 0.65rem">LOGS_AND_TRAFFIC_DATA</p>
         </div>
 
         <div class="d-flex align-items-center gap-2">
             @if(request()->has(['referral_code', 'date_from', 'date_to']))
-                <div class="badge bg-white border text-dark px-3 py-2 d-flex align-items-center gap-2" style="border-radius: 10px; font-weight: 500;">
-                    <i class="bi bi-info-circle text-primary"></i>
-                    {{ request('referral_code') ?: 'All Referrals' }} | {{ request('date_from') ?: 'All Time' }} - {{ request('date_to') ?: 'Present' }}
+                <div class="badge border text-muted fw-500 px-2 py-1 small d-none d-md-block mono" style="border-color: var(--border-primary); border-radius: 2px; font-size: 0.65rem">
+                    {{ request('referral_code') ?: 'ALL' }} // {{ request('date_from') ?: 'START' }} - {{ request('date_to') ?: 'NOW' }}
                 </div>
             @endif
-            <button class="btn btn-primary d-flex align-items-center gap-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas">
-                <i class="bi bi-sliders"></i> <span>Filters</span>
+            <button class="btn btn-primary d-flex align-items-center gap-1 btn-sm mono" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas" style="font-size: 0.65rem">
+                <i class="bi bi-sliders"></i> <span>FILTERS</span>
             </button>
         </div>
     </div>
     
     <!-- Key Metrics Section -->
-    <section id="dashboard" class="mb-5">
-        
-        <div class="row g-4">
-            <div class="col-md-6 col-lg-3">
-                <div class="counter-box shadow-sm">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h3>{{ $totalVisitors ?? 0 }}</h3>
-                            <p>Total Visitors</p>
-                        </div>
-                        <div class="bg-primary bg-opacity-10 p-2 rounded-3">
-                            <i class="bi bi-eye text-primary fs-4"></i>
-                        </div>
+    <section id="dashboard" class="mb-3">
+        <div class="row g-2">
+            <div class="col-6 col-lg-3">
+                <div class="counter-box">
+                    <p>TOTAL_VISITORS</p>
+                    <h3>{{ $totalVisitors ?? 0 }}</h3>
+                    <div class="position-absolute end-0 top-0 p-2 opacity-25">
+                        <i class="bi bi-eye fs-2"></i>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="counter-box shadow-sm">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h3>{{ $uniqueVisitors ?? 0 }}</h3>
-                            <p>Unique Visitors</p>
-                        </div>
-                        <div class="bg-success bg-opacity-10 p-2 rounded-3">
-                            <i class="bi bi-person-check text-success fs-4"></i>
-                        </div>
+            <div class="col-6 col-lg-3">
+                <div class="counter-box">
+                    <p>UNIQUE_VISITORS</p>
+                    <h3>{{ $uniqueVisitors ?? 0 }}</h3>
+                    <div class="position-absolute end-0 top-0 p-2 opacity-25">
+                        <i class="bi bi-person-check fs-2"></i>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="counter-box shadow-sm">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h3>{{ $totalRerferral ?? 0 }}</h3>
-                            <p>Active Referrals</p>
-                        </div>
-                        <div class="bg-warning bg-opacity-10 p-2 rounded-3">
-                            <i class="bi bi-link-45deg text-warning fs-4"></i>
-                        </div>
+            <div class="col-6 col-lg-3">
+                <div class="counter-box">
+                    <p>ACTIVE_REFS</p>
+                    <h3>{{ $totalRerferral ?? 0 }}</h3>
+                    <div class="position-absolute end-0 top-0 p-2 opacity-25">
+                        <i class="bi bi-link-45deg fs-2"></i>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="counter-box shadow-sm">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h3>{{ $totalUniqueSource ?? 0 }}</h3>
-                            <p>Unique Sources</p>
-                        </div>
-                        <div class="bg-info bg-opacity-10 p-2 rounded-3">
-                            <i class="bi bi-share text-info fs-4"></i>
-                        </div>
+            <div class="col-6 col-lg-3">
+                <div class="counter-box">
+                    <p>UNIQUE_SOURCES</p>
+                    <h3>{{ $totalUniqueSource ?? 0 }}</h3>
+                    <div class="position-absolute end-0 top-0 p-2 opacity-25">
+                        <i class="bi bi-share fs-2"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="row g-4 mt-4">
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h2 class="chart-title">Performance (Last 30 Days)</h2>
-                        <div style="height: 300px; position: relative;">
-                            <canvas id="last30DaysChart"></canvas>
-                        </div>
-                    </div>
+        <div class="card mt-2">
+            <div class="card-body p-2">
+                <h2 class="chart-title mb-2 mono">PERFORMANCE_30D</h2>
+                <div style="height: 200px; position: relative;">
+                    <canvas id="last30DaysChart"></canvas>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="visitors" class="row mb-5">
+    <section class="row mb-3 g-2">
         <div class="col-lg-8">    
-            <div class="card">
-                <div class="card-body">
-                    <h2 class="chart-title">Latest Visitors</h2>
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center py-2">
+                    <h2 class="chart-title mb-0 mono">LATEST_LOGS</h2>
+                    <a href="{{ route('tracker.visitors') }}" class="btn btn-link btn-sm text-decoration-none mono" style="font-size: 0.65rem; color: var(--accent-cyan)">VIEW_ALL</a>
+                </div>
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead class="table-dark">
+                        <table class="table table-hover mb-0">
+                            <thead>
                                 <tr>
-                                    <th>Country</th>
-                                    <th>Referral Code</th>
-                                    <th>Source & Medium</th>
-                                    <th>Visits</th>
-                                    <th>First Visit</th>
+                                    <th>COUNTRY</th>
+                                    <th class="d-none d-md-table-cell">REF</th>
+                                    <th>SOURCE</th>
+                                    <th class="text-end">VISITS</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($visitors as $visitor)
                                     <tr>
                                         <td>
-                                            {!! $visitor->country_flag !!} {{ $visitor->country_name }}
+                                            <span class="d-flex align-items-center gap-1">
+                                                {!! $visitor->country_flag !!} <span class="d-none d-sm-inline">{{ $visitor->country_name }}</span>
+                                            </span>
                                         </td>
-                                        <td>{{ $visitor->referral_code }}</td>
-                                        <td>{{ $visitor->utm_source }} - {{ $visitor->utm_medium }}</td>
-                                        <td>{{ $visitor->visits ?? 0 }}</td>
-                                        <td>{{ $visitor->created_at->format('Y-m-d H:i:s') }}</td>
+                                        <td class="d-none d-md-table-cell mono" style="font-size: 0.65rem">{{ $visitor->referral_code ?: '-' }}</td>
+                                        <td class="mono" style="font-size: 0.7rem">{{ $visitor->utm_source ?: 'DIRECT' }}</td>
+                                        <td class="text-end fw-700 mono" style="color: var(--accent-cyan)">{{ $visitor->visits ?? 0 }}</td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center">No visitors found</td>
+                                        <td colspan="4" class="text-center py-4 text-muted mono">NO_DATA_FOUND</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -134,30 +115,32 @@
         </div>
 
         <div class="col-lg-4">    
-            <div class="card">
-                <div class="card-body">
-                    <h2 class="chart-title">Most Visited Page</h2>
+            <div class="card h-100">
+                <div class="card-header py-2">
+                    <h2 class="chart-title mb-0 mono">TOP_PAGES</h2>
+                </div>
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead class="table-dark">
+                        <table class="table table-hover mb-0">
+                            <thead>
                                 <tr>
-                                    <th>Pages</th>
-                                    <th>Visits</th>
+                                    <th>PAGE</th>
+                                    <th class="text-end">HITS</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($mostVisitedPages as $page)
                                     <tr>
-                                        <td>
-                                            <a href="{{ url($page->visit_url ?? '/') }}" target="_blank" class="text-black d-block">
+                                        <td class="text-truncate mono" style="max-width: 140px; font-size: 0.7rem">
+                                            <a href="{{ url($page->visit_url ?? '/') }}" target="_blank" class="text-decoration-none" style="color: var(--accent-cyan)">
                                                 {{ $page->visit_url }}
                                             </a>
                                         </td>
-                                        <td>{{ $page->visit_count ?? 0 }}</td>
+                                        <td class="text-end fw-700 mono">{{ $page->visit_count ?? 0 }}</td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="2" class="text-center">No ip address found</td>
+                                        <td colspan="2" class="text-center py-4 text-muted mono">NO_DATA</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -168,12 +151,12 @@
         </div>
     </section>
 
-    <section id="visitors" class="row mb-5">
+    <section class="row mb-3 g-2">
         <div class="col-lg-6">
             <div class="card">
-                <div class="card-body">
-                    <h2 class="chart-title">Visitor Trends by Medium</h2>
-                    <div style="height: 300px; position: relative;">
+                <div class="card-body p-2">
+                    <h2 class="chart-title mb-2 mono">MEDIUM_DISTRIBUTION</h2>
+                    <div style="height: 200px; position: relative;">
                         <canvas id="mediumTrendChart"></canvas>
                     </div>
                 </div>
@@ -182,9 +165,9 @@
         
         <div class="col-lg-6">
             <div class="card">
-                <div class="card-body">
-                    <h2 class="chart-title">Visitor Distribution by Source</h2>
-                    <div style="height: 300px; position: relative;">
+                <div class="card-body p-2">
+                    <h2 class="chart-title mb-2 mono">SOURCE_DISTRIBUTION</h2>
+                    <div style="height: 200px; position: relative;">
                         <canvas id="sourcePieChart"></canvas>
                     </div>
                 </div>
@@ -192,49 +175,46 @@
         </div>
     </section>
 
-    <!-- Detailed Analytics Section -->
-    <section id="analytics" class="mb-5">
-        <h2 class="h4 mb-4">Detailed Analytics</h2>
-        <div class="row g-4">
+    <section id="analytics" class="mb-3">
+        <div class="row g-2">
             <div class="col-lg-12">
                 <div class="card">
-                    <div class="card-body">
-                        <h2 class="chart-title">Performance by Referral Codes</h2>
-                        <div style="height: 300px; position: relative;">
+                    <div class="card-body p-2">
+                        <h2 class="chart-title mb-2 mono">REFERRAL_PERFORMANCE</h2>
+                        <div style="height: 200px; position: relative;">
                             <canvas id="uniqueVisitorChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h2 class="chart-title">Campaign Performance</h2>
-                        <div style="height: 300px; position: relative;">
-                            <canvas id="campaignBarChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
         </div>
     </section>
+</div>
 </div>
 @endsection
 
 @push('tracker-scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="{{ asset('vendor/tracker/js/chart.min.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const chartConfigs = [];
 
-    // Common Chart Defaults
-    Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
-    Chart.defaults.color = '#64748b';
-    Chart.defaults.plugins.tooltip.backgroundColor = '#1e1b4b';
-    Chart.defaults.plugins.tooltip.padding = 12;
-    Chart.defaults.plugins.tooltip.cornerRadius = 8;
+    // Tech Theme Chart Defaults
+    Chart.defaults.font.family = "'JetBrains Mono', monospace";
+    Chart.defaults.font.size = 10;
+    Chart.defaults.color = '#8b949e';
+    Chart.defaults.plugins.tooltip.backgroundColor = '#151921';
+    Chart.defaults.plugins.tooltip.titleColor = '#00f2ff';
+    Chart.defaults.plugins.tooltip.borderColor = '#30363d';
+    Chart.defaults.plugins.tooltip.borderWidth = 1;
+    Chart.defaults.plugins.tooltip.padding = 8;
+    Chart.defaults.plugins.tooltip.cornerRadius = 2;
+
+    const accentCyan = '#00f2ff';
+    const accentOrange = '#f0883e';
+    const accentPurple = '#8b5cf6';
+    const accentGreen = '#10b981';
+    const borderPrimary = '#30363d';
 
     // Unique Visitor Chart (Bar)
     chartConfigs.push({
@@ -245,16 +225,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 labels: @json($uniqueVisitorChart['labels']),
                 datasets: [
                     {
-                        label: 'Total Visits',
+                        label: 'VISITS',
                         data: @json($uniqueVisitorChart['visits']),
-                        backgroundColor: '#6366f1',
-                        borderRadius: 6,
+                        backgroundColor: accentCyan,
+                        borderRadius: 0,
+                        barThickness: 20,
                     },
                     {
-                        label: 'Unique Visitors',
+                        label: 'UNIQUE',
                         data: @json($uniqueVisitorChart['unique_visitors']),
-                        backgroundColor: '#f43f5e',
-                        borderRadius: 6,
+                        backgroundColor: accentOrange,
+                        borderRadius: 0,
+                        barThickness: 20,
                     }
                 ]
             },
@@ -262,7 +244,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 6 } }
+                    legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 6, font: { size: 9 } } }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { grid: { color: borderPrimary } }
                 }
             }
         }
@@ -277,23 +263,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 labels: @json($last30DaysChart['labels']),
                 datasets: [
                     {
-                        label: 'Page Hits',
+                        label: 'PAGE_HITS',
                         data: @json($last30DaysChart['total_count']),
-                        borderColor: '#6366f1',
-                        backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                        borderColor: accentCyan,
+                        backgroundColor: 'rgba(0, 242, 255, 0.05)',
                         fill: true,
-                        tension: 0.4,
-                        borderWidth: 3,
+                        tension: 0,
+                        borderWidth: 2,
                         pointRadius: 0,
                     },
                     {
-                        label: 'Unique Hits',
+                        label: 'UNIQUE_HITS',
                         data: @json($last30DaysChart['unique_count']),
-                        borderColor: '#10b981',
+                        borderColor: accentGreen,
                         backgroundColor: 'transparent',
                         fill: false,
-                        tension: 0.4,
-                        borderWidth: 3,
+                        tension: 0,
+                        borderWidth: 2,
                         pointRadius: 0,
                         borderDash: [5, 5]
                     }
@@ -307,7 +293,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 scales: {
                     x: { grid: { display: false } },
-                    y: { border: { dash: [4, 4] }, grid: { color: '#f1f5f9' } }
+                    y: { grid: { color: borderPrimary } }
                 }
             }
         }
@@ -322,17 +308,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 labels: @json($sourceChart['labels']),
                 datasets: [{
                     data: @json($sourceChart['counts']),
-                    backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6'],
-                    borderWidth: 0,
-                    hoverOffset: 20
+                    backgroundColor: [accentCyan, accentGreen, accentOrange, accentPurple, '#6366f1'],
+                    borderWidth: 1,
+                    borderColor: borderPrimary,
+                    hoverOffset: 10
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: '70%',
+                cutout: '80%',
                 plugins: {
-                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+                    legend: { position: 'right', labels: { usePointStyle: true, padding: 10, font: { size: 9 } } }
                 }
             }
         }
@@ -348,45 +335,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 datasets: @json($mediumTrendChart['datasets']).map((dataset, index) => ({
                     label: dataset.label,
                     data: dataset.data,
-                    borderColor: ['#6366f1', '#10b981', '#f59e0b'][index % 3],
-                    backgroundColor: ['rgba(99, 102, 241, 0.1)', 'rgba(16, 185, 129, 0.1)'][index % 2],
-                    borderWidth: 2,
-                    pointRadius: 3
+                    borderColor: [accentCyan, accentGreen, accentOrange][index % 3],
+                    backgroundColor: ['rgba(0, 242, 255, 0.1)', 'rgba(16, 185, 129, 0.1)'][index % 2],
+                    borderWidth: 1,
+                    pointRadius: 2
                 }))
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'bottom' }
+                    legend: { position: 'bottom', labels: { font: { size: 9 } } }
                 },
                 scales: {
-                    r: { ticks: { display: false }, grid: { color: '#f1f5f9' } }
-                }
-            }
-        }
-    });
-
-    // Campaign Performance Chart
-    chartConfigs.push({
-        ctx: 'campaignBarChart',
-        config: {
-            type: 'bar',
-            data: {
-                labels: @json($campaignChart['labels']),
-                datasets: [{
-                    label: 'Visits',
-                    data: @json($campaignChart['visits']),
-                    backgroundColor: '#6366f1',
-                    borderRadius: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                indexAxis: 'y',
-                plugins: {
-                    legend: { display: false }
+                    r: { 
+                        ticks: { display: false }, 
+                        grid: { color: borderPrimary },
+                        angleLines: { color: borderPrimary },
+                        pointLabels: { font: { size: 8 } }
+                    }
                 }
             }
         }

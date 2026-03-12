@@ -1,31 +1,30 @@
-@extends('tracker::app')
+@extends(config('tracker.layout', 'tracker::app'))
 
 @section('tracker-content')
     <div class="container-fluid">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-3 gap-2">
         <div>
-            <h1 class="display-6 fw-800 text-dark mb-1" style="letter-spacing: -1.5px;">Referrals</h1>
-            <p class="text-secondary fw-500 mb-0">Manage tracking codes and campaign sources</p>
+            <h1 class="h6 fw-700 text-main mb-0 mono" style="color: var(--accent-cyan)">REFERRAL_SYSTEM</h1>
+            <p class="text-muted small mb-0 mono" style="font-size: 0.65rem">CAMPAIGN_TRACKING_CODES</p>
         </div>
 
         <div class="d-flex align-items-center gap-2">
             @if (request()->has(['referral_code', 'date_from', 'date_to']))
-                <div class="badge bg-white border text-dark px-3 py-2 d-flex align-items-center gap-2" style="border-radius: 10px; font-weight: 500;">
-                    <i class="bi bi-info-circle text-primary"></i>
-                    {{ request('referral_code') ?: 'All Referrals' }} | {{ request('date_from') ?: 'All Time' }}
+                <div class="badge border text-muted fw-500 px-2 py-1 small d-none d-md-block mono" style="border-color: var(--border-primary); border-radius: 2px; font-size: 0.65rem">
+                    {{ request('referral_code') ?: 'ALL' }} // {{ request('date_from') ?: 'START' }}
                 </div>
             @endif
-            <button class="btn btn-primary d-flex align-items-center gap-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas">
-                <i class="bi bi-sliders"></i> <span>Filters</span>
+            <button class="btn btn-primary d-flex align-items-center gap-1 btn-sm mono" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas" style="font-size: 0.65rem">
+                <i class="bi bi-sliders"></i> <span>FILTERS</span>
             </button>
         </div>
     </div>
 
-        <div class="card border-0 shadow-sm overflow-hidden mb-5">
-            <div class="card-header bg-white border-0 p-4 d-flex justify-content-between align-items-center">
-                <h2 class="h5 fw-700 mb-0">Referral Codes</h2>
-                <button class="btn btn-primary btn-sm px-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#trackerRef" data-item=''>
-                    <i class="bi bi-plus-lg me-1"></i> New Referral
+        <div class="card border-0 shadow-sm overflow-hidden mb-4">
+            <div class="card-header border-bottom p-2 d-flex justify-content-between align-items-center">
+                <h2 class="chart-title mb-0 mono">ACTIVE_CODES</h2>
+                <button class="btn btn-primary btn-sm px-2 mono" data-bs-toggle="modal" data-bs-target="#trackerRef" data-item='' style="font-size: 0.65rem">
+                    <i class="bi bi-plus-lg me-1"></i> NEW_CODE
                 </button>
             </div>
             <div class="card-body p-0">
@@ -33,10 +32,10 @@
                     <table class="table table-hover mb-0">
                         <thead>
                             <tr>
-                                <th>Code / Status</th>
-                                <th>Campaign Details</th>
-                                <th>Performance</th>
-                                <th>Timing</th>
+                                <th>Code</th>
+                                <th>Campaign</th>
+                                <th class="text-center">Visits</th>
+                                <th class="d-none d-md-table-cell">Timing</th>
                                 <th class="text-end">Actions</th>
                             </tr>
                         </thead>
@@ -45,47 +44,43 @@
                                 <tr>
                                     <td>
                                         <div class="d-flex flex-column">
-                                            <span class="fw-700 text-dark">{{ $referral->code }}</span>
-                                            <span class="badge {{ $referral->status ? 'bg-success' : 'bg-secondary' }} bg-opacity-10 {{ $referral->status ? 'text-success' : 'text-secondary' }} px-2 py-1 rounded-pill mt-1" style="width: fit-content; font-size: 0.65rem;">
-                                                {{ $referral->status ? 'ACTIVE' : 'INACTIVE' }}
+                                            <span class="fw-700 text-dark small">{{ $referral->code }}</span>
+                                            <span class="badge {{ $referral->status ? 'text-success' : 'text-secondary' }} p-0 text-uppercase fw-800" style="font-size: 0.6rem;">
+                                                {{ $referral->status ? 'Active' : 'Inactive' }}
                                             </span>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="d-flex flex-column">
-                                            <span class="fw-600 text-dark small">{{ $referral->title }}</span>
-                                            <small class="text-secondary">{{ Str::limit($referral->description, 40) }}</small>
+                                            <span class="fw-600 text-dark small">{{ Str::limit($referral->title, 20) }}</span>
+                                            <small class="text-secondary d-none d-sm-block" style="font-size: 0.7rem;">{{ Str::limit($referral->description, 30) }}</small>
                                         </div>
                                     </td>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <a href="{{ route('tracker.visitors') }}?referral_code={{ $referral->code }}" class="btn btn-light btn-sm text-primary fw-700 px-3 rounded-pill">
-                                                <i class="bi bi-person-up me-1"></i> {{ $referral->logs_count }} visits
-                                            </a>
-                                        </div>
+                                    <td class="text-center">
+                                        <a href="{{ route('tracker.visitors') }}?referral_code={{ $referral->code }}" class="text-primary fw-700 small text-decoration-none">
+                                            {{ $referral->logs_count }} <i class="bi bi-arrow-right-short"></i>
+                                        </a>
                                     </td>
-                                    <td>
+                                    <td class="d-none d-md-table-cell">
                                         <div class="d-flex flex-column">
-                                            <small class="text-dark fw-500">Created {{ $referral->created_at->format('M d, Y') }}</small>
+                                            <small class="text-dark fw-500" style="font-size: 0.75rem;">Created {{ $referral->created_at->format('M d, Y') }}</small>
                                             @if($referral->expires_at)
-                                                <small class="text-danger fw-600">Expires {{ $referral->expires_at->format('M d, Y') }}</small>
-                                            @else
-                                                <small class="text-secondary">No expiry</small>
+                                                <small class="text-danger fw-600" style="font-size: 0.7rem;">Exp. {{ $referral->expires_at->format('M d, Y') }}</small>
                                             @endif
                                         </div>
                                     </td>
                                     <td class="text-end">
-                                        <button class="btn btn-outline-primary btn-sm border-0 rounded-circle" data-bs-toggle="modal" data-bs-target="#trackerRef" data-item='{{ json_encode($referral) }}'>
-                                            <i class="bi bi-pencil-square"></i>
+                                        <button class="btn btn-light btn-sm rounded-circle p-1" style="width: 28px; height: 28px;" data-bs-toggle="modal" data-bs-target="#trackerRef" data-item='{{ json_encode($referral) }}'>
+                                            <i class="bi bi-pencil-square" style="font-size: 0.8rem;"></i>
                                         </button>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center py-5">
-                                        <div class="p-4">
-                                            <i class="bi bi-link-45deg fs-1 text-secondary opacity-25 d-block mb-3"></i>
-                                            <p class="text-secondary fw-500">No referral codes found. Create your first one above.</p>
+                                    <td colspan="5" class="text-center py-4">
+                                        <div class="p-3">
+                                            <i class="bi bi-link-45deg fs-2 text-secondary opacity-25 d-block mb-2"></i>
+                                            <p class="text-secondary small mb-0">No codes found.</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -93,7 +88,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-4">
+                <div class="mt-3 p-3">
                     @if (!empty($referrals->count()))
                         {!! $referrals->appends(request()->all())->links('pagination::bootstrap-5') !!}
                     @endif
@@ -154,7 +149,6 @@
 @endsection
 
 @push('tracker-scripts')
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const modal = document.getElementById('trackerRef');

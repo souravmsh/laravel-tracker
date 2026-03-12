@@ -3,10 +3,11 @@
 namespace Souravmsh\LaravelTracker\Listeners;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Souravmsh\LaravelTracker\Events\IpApiEvent;
 use Souravmsh\LaravelTracker\Services\IpApiService;
 
-class IpApiListener
+class IpApiListener implements ShouldQueue
 {
     public function handle(IpApiEvent $event)
     {

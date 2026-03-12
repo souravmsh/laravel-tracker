@@ -5,6 +5,7 @@ namespace Souravmsh\LaravelTracker\Services;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Exception;
 use Souravmsh\LaravelTracker\Models\TrackerSetting;
 
 class TrackerSettingService
@@ -13,16 +14,24 @@ class TrackerSettingService
     protected const CACHE_TTL = 3600; // 1 hour in seconds
 
     /**
+     * Load all setting rows from cache or DB.
+     */
+    public function allRows(): \Illuminate\Support\Collection
+    {
+        return Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
+            if (!Schema::hasTable('tracker_settings')) {
+                return collect();
+            }
+            return TrackerSetting::all();
+        });
+    }
+
+    /**
      * Load all settings from cache or DB as a key→value array.
      */
     public function all(): array
     {
-        return Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
-            if (!Schema::hasTable('tracker_settings')) {
-                return [];
-            }
-            return TrackerSetting::pluck('value', 'key')->toArray();
-        });
+        return $this->allRows()->pluck('value', 'key')->toArray();
     }
 
     /**
@@ -30,16 +39,13 @@ class TrackerSettingService
      */
     public function get(string $key, mixed $default = null): mixed
     {
-        $settings = $this->all();
+        $row = $this->allRows()->where('key', $key)->first();
 
-        if (!array_key_exists($key, $settings)) {
+        if (!$row) {
             return $default;
         }
 
-        $row = TrackerSetting::where('key', $key)->first();
-        $raw = $settings[$key];
-
-        return $this->cast($raw, $row?->type ?? 'string');
+        return $this->cast($row->value, $row->type ?? 'string');
     }
 
     /**
@@ -99,7 +105,11 @@ class TrackerSettingService
     public function mergeIntoConfig(): void
     {
         try {
-            $settings = $this->all();
+            $settings = $this->allRows();
+
+            if ($settings->isEmpty()) {
+                return;
+            }
 
             $map = [
                 'enabled'          => 'tracker.enabled',
@@ -118,16 +128,21 @@ class TrackerSettingService
                 'referral_code_params' => 'tracker.referral_code_params',
                 'ignore_paths'         => 'tracker.ignore_paths',
                 'allowed_paths'        => 'tracker.allowed_paths',
+                'layout'               => 'tracker.layout',
+                'title'                => 'tracker.title',
+                'cache_ttl'            => 'tracker.cache_ttl',
+                'route_prefix'         => 'tracker.routes.prefix',
+                'route_middleware'     => 'tracker.routes.middleware',
             ];
 
             foreach ($map as $dbKey => $configKey) {
-                if (array_key_exists($dbKey, $settings)) {
-                    $row   = TrackerSetting::where('key', $dbKey)->first();
-                    $value = $this->cast($settings[$dbKey], $row?->type ?? 'string');
+                $row = $settings->where('key', $dbKey)->first();
+                if ($row) {
+                    $value = $this->cast($row->value, $row->type ?? 'string');
                     config([$configKey => $value]);
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Silently fail on early boot (e.g., before migrations run)
         }
     }

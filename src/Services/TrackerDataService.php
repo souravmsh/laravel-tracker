@@ -3,6 +3,7 @@
 namespace Souravmsh\LaravelTracker\Services;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Souravmsh\LaravelTracker\Models\TrackerLog;
 use Souravmsh\LaravelTracker\Models\TrackerReferral;
 
@@ -10,24 +11,57 @@ class TrackerDataService
 {
     /**
      * Build a base TrackerLog query with common filters applied.
+     * Uses timestamp comparisons instead of whereDate for index utilization.
      */
     protected static function baseLogQuery($request)
     {
-        return TrackerLog::when($request->referral_code, fn($q) => $q->where("referral_code", $request->referral_code))
-            ->when($request->ip_address,   fn($q) => $q->where("ip_address", $request->ip_address))
-            ->when($request->date_from,    fn($q) => $q->whereDate("created_at", ">=", $request->date_from))
-            ->when($request->date_to,      fn($q) => $q->whereDate("created_at", "<=", $request->date_to));
+        $query = TrackerLog::query();
+
+        if ($request->referral_code) {
+            $query->where("referral_code", $request->referral_code);
+        }
+        
+        if ($request->ip_address) {
+            $query->where("ip_address", $request->ip_address);
+        }
+        
+        if ($request->date_from) {
+            $query->where("created_at", ">=", $request->date_from . " 00:00:00");
+        }
+        
+        if ($request->date_to) {
+            $query->where("created_at", "<=", $request->date_to . " 23:59:59");
+        }
+
+        return $query;
     }
 
     public static function getDashboardReport($request)
     {
+        $cacheTtl = config('tracker.cache_ttl', 300);
+        $cacheKey = 'tracker_dashboard_report_' . md5(json_encode($request->all()));
+
+        if ($cacheTtl > 0 && Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
+
+        // --- Summary stats (consolidated into one query) -------------------------
+        $stats = static::baseLogQuery($request)
+            ->selectRaw("
+                COUNT(*) as total_visits,
+                COUNT(DISTINCT visitor_id) as unique_visitors,
+                COUNT(DISTINCT CASE WHEN referral_code IS NOT NULL THEN referral_code END) as total_referrals,
+                COUNT(DISTINCT utm_source) as total_unique_sources
+            ")->first();
+
         // --- Referrals with log counts ------------------------------------------
         $referralsQuery = TrackerReferral::withCount([
-            'logs' => fn($q) => $q
-                ->when($request->date_from,    fn($q) => $q->whereDate('created_at', '>=', $request->date_from))
-                ->when($request->date_to,      fn($q) => $q->whereDate('created_at', '<=', $request->date_to))
-                ->when($request->ip_address,   fn($q) => $q->where('ip_address', $request->ip_address))
-                ->when($request->referral_code, fn($q) => $q->where('referral_code', $request->referral_code)),
+            'logs' => function($q) use ($request) {
+                if ($request->date_from) $q->where('created_at', '>=', $request->date_from . " 00:00:00");
+                if ($request->date_to)   $q->where('created_at', '<=', $request->date_to . " 23:59:59");
+                if ($request->ip_address) $q->where('ip_address', $request->ip_address);
+                if ($request->referral_code) $q->where('referral_code', $request->referral_code);
+            },
         ]);
 
         if ($request->referral_code) {
@@ -35,76 +69,33 @@ class TrackerDataService
         }
         $referrals = $referralsQuery->orderByDesc('logs_count')->get();
 
-        // --- Summary stats (consolidated into one query) -------------------------
-        $statsQuery = static::baseLogQuery($request);
-        $stats = $statsQuery->selectRaw("
-            COUNT(*) as total_visits,
-            COUNT(DISTINCT visitor_id) as unique_visitors,
-            COUNT(DISTINCT CASE WHEN referral_code IS NOT NULL THEN referral_code END) as total_referrals,
-            COUNT(DISTINCT utm_source) as total_unique_sources
-        ")->first();
-
-        $totalVisitors     = (int) ($stats->total_visits ?? 0);
-        $uniqueVisitors    = (int) ($stats->unique_visitors ?? 0);
-        $totalRerferral    = (int) ($stats->total_referrals ?? 0);
-        $totalUniqueSource = (int) ($stats->total_unique_sources ?? 0);
-
-        // --- Latest visitors (simplified — most recent log per visitor) ----------
+        // --- Latest visitors (grouped optimally) --------------------------------
         $visitors = static::baseLogQuery($request)
-            ->selectRaw("
-                visitor_id,
-                session_id,
-                referral_code,
-                utm_source,
-                utm_medium,
-                ip_address,
-                MAX(visit_url)     as visit_url,
-                MAX(referral_url)  as referral_url,
-                MAX(country_name)  as country_name,
-                MAX(country_code)  as country_code,
-                MAX(country_flag)  as country_flag,
-                MAX(created_at)    as created_at,
-                COUNT(*)           as page_views
-            ")
-            ->groupBy("visitor_id", "session_id", "referral_code", "utm_source", "utm_medium", "ip_address")
-            ->orderByDesc("created_at")
+            ->select('visitor_id', 'session_id', 'referral_code', 'utm_source', 'utm_medium', 'ip_address', 'country_name', 'country_code', 'country_flag', 'visit_url', 'referral_url', 'created_at')
+            ->latest()
             ->limit(5)
             ->get();
 
         // --- Unique visitors per referral for chart ------------------------------
-        $uniqueVisitorsPerReferral = TrackerLog::selectRaw("referral_code, COUNT(DISTINCT visitor_id) as unique_count")
-            ->when($request->referral_code, fn($q) => $q->where("referral_code", $request->referral_code))
-            ->when($request->ip_address,    fn($q) => $q->where("ip_address", $request->ip_address))
-            ->when($request->date_from,     fn($q) => $q->whereDate("created_at", ">=", $request->date_from))
-            ->when($request->date_to,       fn($q) => $q->whereDate("created_at", "<=", $request->date_to))
+        $uniqueVisitorsPerReferral = static::baseLogQuery($request)
             ->whereNotNull("referral_code")
+            ->selectRaw("referral_code, COUNT(DISTINCT visitor_id) as unique_count")
             ->groupBy("referral_code")
             ->pluck("unique_count", "referral_code")
             ->toArray();
 
-        $uniqueVisitorChart = [
-            "labels"          => $referrals->pluck("code")->toArray(),
-            "visits"          => $referrals->pluck("logs_count")->toArray(),
-            "unique_visitors" => $referrals->map(fn($r) => $uniqueVisitorsPerReferral[$r->code] ?? 0)->toArray(),
-        ];
-
         // --- Daily visitor trend (last 30 days or filtered range) ---------------
-        $visitorChartData = static::baseLogQuery($request)
-            ->when(!$request->date_from && !$request->date_to,
-                fn($q) => $q->whereDate("created_at", ">=", now()->subDays(30))
-            )
-            ->selectRaw("DATE(created_at) as date, COUNT(*) as total_count, COUNT(DISTINCT visitor_id) as unique_count")
+        $trendQuery = static::baseLogQuery($request);
+        if (!$request->date_from && ! $request->date_to) {
+            $trendQuery->where("created_at", ">=", now()->subDays(30)->startOfDay());
+        }
+        
+        $visitorChartData = $trendQuery->selectRaw("DATE(created_at) as date, COUNT(*) as total_count, COUNT(DISTINCT visitor_id) as unique_count")
             ->groupByRaw("DATE(created_at)")
             ->orderBy("date")
             ->get();
 
-        $last30DaysChart = [
-            "labels"      => $visitorChartData->pluck("date")->toArray(),
-            "total_count" => $visitorChartData->pluck("total_count")->toArray(),
-            "unique_count"=> $visitorChartData->pluck("unique_count")->toArray(),
-        ];
-
-        // --- UTM Source chart ----------------------------------------------------
+        // --- UTM Distribution Data (Consolidated) --------------------------------
         $sourceChartRaw = static::baseLogQuery($request)
             ->selectRaw("utm_source, COUNT(*) as visit_count, COUNT(DISTINCT visitor_id) as unique_count")
             ->whereNotNull("utm_source")
@@ -112,13 +103,6 @@ class TrackerDataService
             ->orderByDesc("visit_count")
             ->get();
 
-        $sourceChart = [
-            "labels"       => $sourceChartRaw->pluck("utm_source")->toArray(),
-            "counts"       => $sourceChartRaw->pluck("visit_count")->toArray(),
-            "unique_counts"=> $sourceChartRaw->pluck("unique_count")->toArray(),
-        ];
-
-        // --- UTM Medium chart ----------------------------------------------------
         $mediumChartRaw = static::baseLogQuery($request)
             ->selectRaw("utm_medium, COUNT(*) as visit_count, COUNT(DISTINCT visitor_id) as unique_count")
             ->whereNotNull("utm_medium")
@@ -126,21 +110,6 @@ class TrackerDataService
             ->orderByDesc("visit_count")
             ->get();
 
-        $mediumTrendChart = [
-            "labels"   => $mediumChartRaw->pluck("utm_medium")->toArray(),
-            "datasets" => [
-                [
-                    "label" => "Total Visits",
-                    "data"  => $mediumChartRaw->pluck("visit_count")->toArray(),
-                ],
-                [
-                    "label" => "Unique Visitors",
-                    "data"  => $mediumChartRaw->pluck("unique_count")->toArray(),
-                ],
-            ],
-        ];
-
-        // --- UTM Campaign chart --------------------------------------------------
         $campaignChartRaw = static::baseLogQuery($request)
             ->selectRaw("utm_campaign, COUNT(*) as total_visits, COUNT(DISTINCT visitor_id) as unique_count")
             ->whereNotNull("utm_campaign")
@@ -148,43 +117,63 @@ class TrackerDataService
             ->orderByDesc("total_visits")
             ->get();
 
-        $campaignChart = [
-            "labels"       => $campaignChartRaw->pluck("utm_campaign")->toArray(),
-            "visits"       => $campaignChartRaw->pluck("total_visits")->toArray(),
-            "unique_counts"=> $campaignChartRaw->pluck("unique_count")->toArray(),
-        ];
-
         // --- Most visited pages -------------------------------------------------
         $mostVisitedPages = static::baseLogQuery($request)
-            ->selectRaw("visit_url, COUNT(*) as visit_count, COUNT(DISTINCT visitor_id) as unique_count")
+            ->selectRaw("visit_url, COUNT(*) as visit_count")
             ->whereNotNull("visit_url")
             ->groupBy("visit_url")
             ->orderByDesc("visit_count")
             ->limit(10)
             ->get();
 
-        return [
+        $report = [
             "referrals"          => $referrals,
             "visitors"           => $visitors,
-            "uniqueVisitorChart" => $uniqueVisitorChart,
-            "last30DaysChart"    => $last30DaysChart,
-            "sourceChart"        => $sourceChart,
-            "mediumTrendChart"   => $mediumTrendChart,
-            "campaignChart"      => $campaignChart,
+            "uniqueVisitorChart" => [
+                "labels"          => $referrals->pluck("code")->toArray(),
+                "visits"          => $referrals->pluck("logs_count")->toArray(),
+                "unique_visitors" => $referrals->map(fn($r) => $uniqueVisitorsPerReferral[$r->code] ?? 0)->toArray(),
+            ],
+            "last30DaysChart"    => [
+                "labels"      => $visitorChartData->pluck("date")->toArray(),
+                "total_count" => $visitorChartData->pluck("total_count")->toArray(),
+                "unique_count"=> $visitorChartData->pluck("unique_count")->toArray(),
+            ],
+            "sourceChart"        => [
+                "labels"       => $sourceChartRaw->pluck("utm_source")->toArray(),
+                "counts"       => $sourceChartRaw->pluck("visit_count")->toArray(),
+                "unique_counts"=> $sourceChartRaw->pluck("unique_count")->toArray(),
+            ],
+            "mediumTrendChart"   => [
+                "labels"   => $mediumChartRaw->pluck("utm_medium")->toArray(),
+                "datasets" => [
+                    ["label" => "Total Visits", "data" => $mediumChartRaw->pluck("visit_count")->toArray()],
+                    ["label" => "Unique Visitors", "data" => $mediumChartRaw->pluck("unique_count")->toArray()],
+                ],
+            ],
+            "campaignChart"      => [
+                "labels"       => $campaignChartRaw->pluck("utm_campaign")->toArray(),
+                "visits"       => $campaignChartRaw->pluck("total_visits")->toArray(),
+                "unique_counts"=> $campaignChartRaw->pluck("unique_count")->toArray(),
+            ],
             "mostVisitedPages"   => $mostVisitedPages,
-            "totalVisitors"      => $totalVisitors,
-            "uniqueVisitors"     => $uniqueVisitors,
-            "totalRerferral"     => $totalRerferral,
-            "totalUniqueSource"  => $totalUniqueSource,
+            "totalVisitors"      => (int) ($stats->total_visits ?? 0),
+            "uniqueVisitors"     => (int) ($stats->unique_visitors ?? 0),
+            "totalRerferral"     => (int) ($stats->total_referrals ?? 0),
+            "totalUniqueSource"  => (int) ($stats->total_unique_sources ?? 0),
         ];
+
+        if ($cacheTtl > 0) {
+            Cache::put($cacheKey, $report, now()->addSeconds($cacheTtl));
+        }
+
+        return $report;
     }
 
-    /**
-     * Paginated visitors list, grouped per visitor/session, with visit counts.
-     */
     public static function getVisitors($request)
     {
-        return TrackerLog::selectRaw("
+        return static::baseLogQuery($request)
+            ->selectRaw("
                 visitor_id,
                 session_id,
                 ip_address,
@@ -204,11 +193,6 @@ class TrackerDataService
                 MAX(created_at)   as created_at,
                 COUNT(*)          as page_views
             ")
-            ->when($request->referral_code, fn($q) => $q->where("referral_code", $request->referral_code))
-            ->when($request->date_from,     fn($q) => $q->whereDate("created_at", ">=", $request->date_from))
-            ->when($request->date_to,       fn($q) => $q->whereDate("created_at", "<=", $request->date_to))
-            ->when($request->country_code,  fn($q) => $q->where("country_code", $request->country_code))
-            ->when($request->ip_address,    fn($q) => $q->where("ip_address", $request->ip_address))
             ->groupBy(
                 "visitor_id",
                 "session_id",
@@ -224,9 +208,6 @@ class TrackerDataService
             ->paginate($request->input("per_page", 15));
     }
 
-    /**
-     * Paginated referrals list with log counts.
-     */
     public static function getReferrals($request)
     {
         return TrackerReferral::withCount("logs")
@@ -237,9 +218,6 @@ class TrackerDataService
             ->paginate(15);
     }
 
-    /**
-     * Create or update a referral record.
-     */
     public static function saveReferral($request)
     {
         $data = [

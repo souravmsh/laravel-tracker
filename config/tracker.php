@@ -11,6 +11,18 @@
 
 return [
     'enabled'         => env('TRACKER_ENABLED', true),
+    'title'           => env('APP_NAME', 'TRACKER').' // ANALYTICS',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Route Configuration
+    |--------------------------------------------------------------------------
+    | Configure the URL prefix and middleware for the tracker dashboard.
+    */
+    'routes' => [
+        'prefix'     => 'tracker',
+        'middleware' => ['web', 'tracker'], // You can add 'auth', 'role:admin' etc.
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -63,7 +75,8 @@ return [
     'rate_limit'      => 300,
     'session_lifetime'=> 1440,
     'max_input_length'=> 255,
-
+    'layout'          => 'tracker::app',
+    'cache_ttl'       => env('TRACKER_CACHE_TTL', 300), // TTL in seconds (0 to disable)
     'analytics' => [
         'google' => [
             'enabled'        => false,

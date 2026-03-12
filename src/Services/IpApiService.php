@@ -110,7 +110,7 @@ class IPApiService
                 return $countryData;
             } catch (Exception $e) {
                 if ($e instanceof \Illuminate\Http\Client\RequestException && $e->response->status() === 429) {
-                    Log::warning("[LaravelTracker]AnalyticService@track - IP API rate limit exceeded", [
+                    Log::warning("[LaravelTracker] IpApiService@getCountryFromIp - IP API rate limit exceeded", [
                         "ip_address" => $ipAddress,
                         "attempt" => $attempt,
                         "error" => $e->getMessage(),
@@ -123,7 +123,7 @@ class IPApiService
                     }
                 }
 
-                Log::error("[LaravelTracker]AnalyticService@track - Failed to fetch country from IP", [
+                Log::error("[LaravelTracker] IpApiService@getCountryFromIp - Failed to fetch country from IP", [
                     "ip_address" => $ipAddress,
                     "error" => $e->getMessage(),
                 ]);

@@ -62,6 +62,13 @@ class TrackerMiddlewareService
                 "created_at"    => now(),
             ];
 
+            // Flag if geocoding is needed (only once per session)
+            $needsGeo = config("tracker.analytics.ip_api.enabled") && !Session::has("tracker_geo_tracked");
+            if ($needsGeo) {
+                $trackerData["_needs_geo"] = true;
+                Session::put("tracker_geo_tracked", true);
+            }
+
             // Mark this page as visited within the session (TTL: 30 minutes)
             Cache::put($trackingKey, true, now()->addMinutes(30));
             RateLimiter::hit($rateLimitKey, 60);
@@ -75,13 +82,11 @@ class TrackerMiddlewareService
                     TrackerJob::dispatch($trackerData);
                 } else {
                     TrackerLog::create($trackerData);
+                    // Dispatch geocoding immediately if sync
+                    if ($needsGeo) {
+                        event(new IpApiEvent($trackerData));
+                    }
                 }
-            }
-
-            // Fire IP geolocation event (only once per session to avoid redundant API calls)
-            if (config("tracker.analytics.ip_api.enabled") && !Session::has("tracker_geo_tracked")) {
-                event(new IpApiEvent($trackerData));
-                Session::put("tracker_geo_tracked", true);
             }
 
             // Fire Google Analytics event

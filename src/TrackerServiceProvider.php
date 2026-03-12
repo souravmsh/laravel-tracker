@@ -67,7 +67,7 @@ class TrackerServiceProvider extends ServiceProvider
         // Publish assets
         $this->publishes(
             [
-                __DIR__ . "/../public/css" => public_path("vendor/tracker"),
+                __DIR__ . "/../public" => public_path("vendor/tracker"),
             ],
             "tracker-assets"
         );

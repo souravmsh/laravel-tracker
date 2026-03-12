@@ -111,7 +111,8 @@ class TrackerWebController extends Controller
             'rate_limit', 'session_lifetime', 'max_input_length',
             'ip_api_enabled', 'ip_api_token',
             'ga_enabled', 'ga_measurement_id', 'ga_api_secret', 'ga_event_name',
-            'referral_code_params', 'ignore_paths', 'allowed_paths',
+            'referral_code_params', 'ignore_paths', 'allowed_paths', 'layout',
+            'title', 'cache_ttl', 'route_prefix', 'route_middleware',
         ];
 
         $data = [];

@@ -1,23 +1,22 @@
-@extends('tracker::app')
+@extends(config('tracker.layout', 'tracker::app'))
 
 @section('tracker-content')
 <div class="container-fluid">
 
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-3 gap-2">
         <div>
-            <h1 class="display-6 fw-800 text-dark mb-1" style="letter-spacing: -1.5px;">Page Visitors</h1>
-            <p class="text-secondary fw-500 mb-0">Detailed log of all visitor interactions</p>
+            <h1 class="h6 fw-700 text-main mb-0 mono" style="color: var(--accent-cyan)">PAGE_VISITORS</h1>
+            <p class="text-muted small mb-0 mono" style="font-size: 0.65rem">DETAILED_INTERACTION_LOG</p>
         </div>
 
         <div class="d-flex align-items-center gap-2">
             @if(request()->has(['referral_code', 'date_from', 'date_to']))
-                <div class="badge bg-white border text-dark px-3 py-2 d-flex align-items-center gap-2" style="border-radius: 10px; font-weight: 500;">
-                    <i class="bi bi-info-circle text-primary"></i>
-                    {{ request('referral_code') ?: 'All Referrals' }} | {{ request('date_from') ?: 'All Time' }}
+                <div class="badge border text-muted fw-500 px-2 py-1 small d-none d-md-block mono" style="border-color: var(--border-primary); border-radius: 2px; font-size: 0.65rem">
+                    {{ request('referral_code') ?: 'ALL' }} // {{ request('date_from') ?: 'START' }}
                 </div>
             @endif
-            <button class="btn btn-primary d-flex align-items-center gap-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas">
-                <i class="bi bi-sliders"></i> <span>Filters</span>
+            <button class="btn btn-primary d-flex align-items-center gap-1 btn-sm mono" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas" style="font-size: 0.65rem">
+                <i class="bi bi-sliders"></i> <span>FILTERS</span>
             </button>
         </div>
     </div>
@@ -28,64 +27,61 @@
                 <table class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            <th><i class="bi bi-geo-alt me-2"></i>Visitor / Location</th>
-                            <th><i class="bi bi-link-45deg me-2"></i>Destination</th>
-                            <th><i class="bi bi-reception-4 me-2"></i>Visits</th>
-                            <th><i class="bi bi-ticket-perforated me-2"></i>Source Info</th>
-                            <th><i class="bi bi-device-ssd me-2"></i>Device</th>
-                            <th><i class="bi bi-calendar3 me-2"></i>First Seen</th>
+                            <th>Visitor</th>
+                            <th class="d-none d-lg-table-cell">Location</th>
+                            <th>Destination</th>
+                            <th class="text-center">Visits</th>
+                            <th class="d-none d-md-table-cell">Source</th>
+                            <th class="text-end">Time</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($visitors as $visitor)
                             <tr>
                                 <td>
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="bg-light p-2 rounded-circle" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                                            {!! $visitor->country_flag ?: '<i class="bi bi-globe text-secondary"></i>' !!}
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="bg-light rounded-circle text-center" style="width: 32px; height: 32px; line-height: 32px; font-size: 0.8rem;">
+                                            {!! $visitor->country_flag ?: '<i class="bi bi-globe"></i>' !!}
                                         </div>
                                         <div>
-                                            <span class="d-block fw-700 text-dark">
+                                            <span class="d-block fw-600 text-dark small">
                                                 {!! ($visitor->country_geo ? ("<a href='https://www.google.com/maps?q={$visitor->country_geo}' target='_blank' class='text-decoration-none'>{$visitor->ip_address}</a>") : $visitor->ip_address) !!}
                                             </span>
-                                            <small class="text-secondary fw-500">{{ $visitor->country_name ?: 'Unknown Location' }}</small>
+                                            <small class="text-secondary d-lg-none" style="font-size: 0.7rem;">{{ $visitor->country_name ?: 'Unknown' }}</small>
                                         </div>
                                     </div>
                                 </td>
-                                <td>
-                                    <small class="d-block text-primary fw-600 mb-1">{{ Str::limit($visitor->visit_url, 30) }}</small>
-                                    @if($visitor->referral_url)
-                                        <small class="text-secondary d-block" style="font-size: 0.75rem;">From: {{ Str::limit($visitor->referral_url, 30) }}</small>
-                                    @endif
+                                <td class="d-none d-lg-table-cell">
+                                    <small class="text-secondary">{{ $visitor->country_name ?: 'Unknown' }}</small>
                                 </td>
                                 <td>
-                                    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-700">
+                                    <small class="d-block text-primary fw-600" title="{{ $visitor->visit_url }}">{{ Str::limit($visitor->visit_url, 25) }}</small>
+                                    @if($visitor->referral_url)
+                                        <small class="text-secondary d-none d-md-block" style="font-size: 0.7rem;" title="{{ $visitor->referral_url }}">via {{ Str::limit($visitor->referral_url, 20) }}</small>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1 rounded-pill fw-700" style="font-size: 0.75rem;">
                                         {{ $visitor->visits ?? 1 }}
                                     </span>
                                 </td>
-                                <td>
+                                <td class="d-none d-md-table-cell">
                                     <div class="d-flex flex-column">
                                         <span class="fw-600 text-dark small">{{ $visitor->referral_code ?: 'Direct' }}</span>
-                                        <small class="text-secondary">{{ $visitor->utm_source ?: 'No Source' }} / {{ $visitor->utm_medium ?: 'N/A' }}</small>
+                                        <small class="text-secondary" style="font-size: 0.7rem;">{{ $visitor->utm_source ?: '-' }}</small>
                                     </div>
                                 </td>
-                                <td>
-                                    <span class="text-secondary small fw-500" title="{{ $visitor->user_agent }}">
-                                        @if(Str::contains($visitor->user_agent, 'Mobile')) <i class="bi bi-smartphone"></i> Mobile 
-                                        @else <i class="bi bi-display"></i> Desktop @endif
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="text-dark fw-500 small">{{ $visitor->created_at->diffForHumans() }}</span>
-                                    <small class="d-block text-secondary" style="font-size: 0.7rem;">{{ $visitor->created_at->format('M d, H:i') }}</small>
+                                <td class="text-end">
+                                    <span class="text-dark fw-500 small d-block">{{ $visitor->created_at->diffForHumans(null, true) }}</span>
+                                    <small class="text-secondary" style="font-size: 0.65rem;">{{ $visitor->created_at->format('M d, H:i') }}</small>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center py-5">
-                                    <div class="p-4">
-                                        <i class="bi bi-mailbox fs-1 text-secondary opacity-25 d-block mb-3"></i>
-                                        <p class="text-secondary fw-500">No visitors tracked yet matching your criteria.</p>
+                                <td colspan="6" class="text-center py-4">
+                                    <div class="p-3">
+                                        <i class="bi bi-mailbox fs-2 text-secondary opacity-25 d-block mb-2"></i>
+                                        <p class="text-secondary small mb-0">No visitors found.</p>
                                     </div>
                                 </td>
                             </tr>
@@ -96,7 +92,7 @@
         </div>
     </div>
     
-    <div class="mt-5 d-flex justify-content-center">
+    <div class="mt-4 d-flex justify-content-center">
         @if ($visitors instanceof \Illuminate\Pagination\LengthAwarePaginator)
             {!! $visitors->appends(request()->all())->links('pagination::bootstrap-5') !!}
         @endif

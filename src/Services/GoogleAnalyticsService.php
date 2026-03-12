@@ -3,13 +3,6 @@
 namespace Souravmsh\LaravelTracker\Services;
 
 use Exception;
-use Google_Client;
-use Google_Service_AnalyticsReporting;
-use Google_Service_AnalyticsReporting_DateRange;
-use Google_Service_AnalyticsReporting_Metric;
-use Google_Service_AnalyticsReporting_Dimension;
-use Google_Service_AnalyticsReporting_ReportRequest;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 
