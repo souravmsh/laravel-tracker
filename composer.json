@@ -2,7 +2,7 @@
     "name": "souravmsh/laravel-tracker",
     "description": "A Laravel package for tracking visitor referrals and logging visitor data",
     "type": "laravel-package",
-    "version": "1.0",
+    "version": "2.0",
     "keywords": [
         "laravel",
         "tracker",
