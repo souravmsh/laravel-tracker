@@ -21,7 +21,7 @@ return [
     */
     'routes' => [
         'prefix'     => 'tracker',
-        'middleware' => ['web', 'tracker'], // You can add 'auth', 'role:admin' etc.
+        'middleware' => ['web', 'auth'], // You can add 'auth', 'role:admin' etc.
     ],
 
     /*
