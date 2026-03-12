@@ -11,11 +11,11 @@
     </div>
 
     @if(session('success'))
-        <div class="alert border-0 mb-4 d-flex align-items-center gap-2 px-3 py-2 small"
-             style="background: rgba(16,185,129,0.10); color: #065f46; border-radius: 8px;">
-            <i class="bi bi-check-circle-fill text-success"></i>
-            <span class="fw-600">{{ session('success') }}</span>
-        </div>
+    <div class="alert border-0 mb-4 d-flex align-items-center gap-2 px-3 py-2 small"
+        style="background: rgba(16,185,129,0.10); color: #065f46; border-radius: 8px;">
+        <i class="bi bi-check-circle-fill text-success"></i>
+        <span class="fw-600">{{ session('success') }}</span>
+    </div>
     @endif
 
     <form action="{{ route('tracker.settings.save') }}" method="POST" id="settingsForm">
@@ -28,7 +28,7 @@
                 <div class="card p-3">
                     <div class="d-flex align-items-center gap-2 mb-3">
                         <span class="rounded bg-primary bg-opacity-10 d-flex align-items-center justify-content-center"
-                              style="width:32px;height:32px;">
+                            style="width:32px;height:32px;">
                             <i class="bi bi-toggles2 text-primary"></i>
                         </span>
                         <div>
@@ -41,44 +41,44 @@
                         @php $g = $settings['general'] ?? [] @endphp
 
                         @foreach(['enabled','debug','queue_enabled','log_to_database'] as $bkey)
-                            @if(isset($g[$bkey]))
-                            @php $s = $g[$bkey] @endphp
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-center justify-content-between p-2 rounded border bg-light bg-opacity-50">
-                                    <div>
-                                        <div class="fw-600 text-dark small">{{ $s['label'] }}</div>
-                                        <small class="text-secondary" style="font-size: 0.7rem;">{{ Str::limit($s['description'], 50) }}</small>
-                                    </div>
-                                    <div class="form-check form-switch mb-0">
-                                        <input class="form-check-input" type="checkbox"
-                                               name="{{ $bkey }}" id="toggle_{{ $bkey }}"
-                                               style="width:2.2em;height:1.1em;"
-                                               {{ filter_var($s['value'], FILTER_VALIDATE_BOOLEAN) ? 'checked' : '' }}>
-                                    </div>
+                        @if(isset($g[$bkey]))
+                        @php $s = $g[$bkey] @endphp
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center justify-content-between p-2 rounded border bg-light bg-opacity-50">
+                                <div>
+                                    <div class="fw-600 text-dark small">{{ $s['label'] }}</div>
+                                    <small class="text-secondary" style="font-size: 0.7rem;">{{ str($s['description'])->limit(50) }}</small>
+                                </div>
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox"
+                                        name="{{ $bkey }}" id="toggle_{{ $bkey }}"
+                                        style="width:2.2em;height:1.1em;"
+                                        {{ filter_var($s['value'], FILTER_VALIDATE_BOOLEAN) ? 'checked' : '' }}>
                                 </div>
                             </div>
-                            @endif
+                        </div>
+                        @endif
                         @endforeach
 
                         @foreach(['rate_limit','session_lifetime','max_input_length', 'cache_ttl'] as $ikey)
-                            @if(isset($g[$ikey]))
-                            @php $s = $g[$ikey] @endphp
-                            <div class="col-md-3">
-                                <label class="form-label fw-600 small text-muted mb-1 mono" style="font-size: 0.65rem">{{ strtoupper(str_replace(' ', '_', $s['label'])) }}</label>
-                                <input type="number" class="form-control form-control-sm mono bg-dark text-main border-secondary" name="{{ $ikey }}"
-                                       value="{{ $s['value'] }}" min="0" style="font-size: 0.75rem;">
-                            </div>
-                            @endif
+                        @if(isset($g[$ikey]))
+                        @php $s = $g[$ikey] @endphp
+                        <div class="col-md-3">
+                            <label class="form-label fw-600 small text-muted mb-1 mono" style="font-size: 0.65rem">{{ strtoupper(str_replace(' ', '_', $s['label'])) }}</label>
+                            <input type="number" class="form-control form-control-sm mono bg-dark text-main border-secondary" name="{{ $ikey }}"
+                                value="{{ $s['value'] }}" min="0" style="font-size: 0.75rem;">
+                        </div>
+                        @endif
                         @endforeach
-                        
+
                         @if(isset($g['title']))
-                            @php $s = $g['title'] @endphp
-                            <div class="col-md-12">
-                                <label class="form-label fw-600 small text-muted mb-1 mono" style="font-size: 0.65rem">{{ strtoupper(str_replace(' ', '_', $s['label'])) }}</label>
-                                <input type="text" class="form-control form-control-sm mono bg-dark text-main border-secondary" name="title"
-                                       value="{{ $s['value'] }}" style="font-size: 0.75rem;">
-                                <div class="form-text text-muted mono" style="font-size: 0.6rem;">{{ $s['description'] }}</div>
-                            </div>
+                        @php $s = $g['title'] @endphp
+                        <div class="col-md-12">
+                            <label class="form-label fw-600 small text-muted mb-1 mono" style="font-size: 0.65rem">{{ strtoupper(str_replace(' ', '_', $s['label'])) }}</label>
+                            <input type="text" class="form-control form-control-sm mono bg-dark text-main border-secondary" name="title"
+                                value="{{ $s['value'] }}" style="font-size: 0.75rem;">
+                            <div class="form-text text-muted mono" style="font-size: 0.6rem;">{{ $s['description'] }}</div>
+                        </div>
                         @endif
                     </div>
                 </div>
@@ -89,7 +89,7 @@
                 <div class="card p-3">
                     <div class="d-flex align-items-center gap-2 mb-3">
                         <span class="rounded bg-primary bg-opacity-10 d-flex align-items-center justify-content-center"
-                              style="width:32px;height:32px;">
+                            style="width:32px;height:32px;">
                             <i class="bi bi-geo-alt text-primary"></i>
                         </span>
                         <div>
@@ -110,9 +110,9 @@
                                 </div>
                                 <div class="form-check form-switch mb-0">
                                     <input class="form-check-input" type="checkbox"
-                                           name="ip_api_enabled" id="toggle_ip_api_enabled"
-                                           style="width:2.2em;height:1.1em;"
-                                           {{ filter_var($s['value'], FILTER_VALIDATE_BOOLEAN) ? 'checked' : '' }}>
+                                        name="ip_api_enabled" id="toggle_ip_api_enabled"
+                                        style="width:2.2em;height:1.1em;"
+                                        {{ filter_var($s['value'], FILTER_VALIDATE_BOOLEAN) ? 'checked' : '' }}>
                                 </div>
                             </div>
                         </div>
@@ -123,7 +123,7 @@
                         <div class="col-md-6">
                             <label class="form-label fw-600 small text-dark mb-1">{{ $s['label'] }}</label>
                             <input type="password" class="form-control form-control-sm" name="ip_api_token"
-                                   value="{{ $s['value'] }}" autocomplete="off">
+                                value="{{ $s['value'] }}" autocomplete="off">
                         </div>
                         @endif
                     </div>
@@ -135,7 +135,7 @@
                 <div class="card p-3">
                     <div class="d-flex align-items-center gap-2 mb-3">
                         <span class="rounded bg-danger bg-opacity-10 d-flex align-items-center justify-content-center"
-                              style="width:32px;height:32px;">
+                            style="width:32px;height:32px;">
                             <i class="bi bi-bar-chart-line text-danger"></i>
                         </span>
                         <div>
@@ -149,33 +149,33 @@
                         @if(isset($ga['ga_enabled']))
                         @php $s = $ga['ga_enabled'] @endphp
                         <div class="col-12 mb-1">
-                            <div class="d-flex align-items-center justify-content-between p-2 rounded border" 
-                                 style="background: rgba(234,67,53,0.03); border-color: rgba(234,67,53,0.1) !important;">
+                            <div class="d-flex align-items-center justify-content-between p-2 rounded border"
+                                style="background: rgba(234,67,53,0.03); border-color: rgba(234,67,53,0.1) !important;">
                                 <div>
                                     <div class="fw-600 text-dark small">{{ $s['label'] }}</div>
                                     <small class="text-secondary" style="font-size: 0.7rem;">{{ Str::limit($s['description'], 60) }}</small>
                                 </div>
                                 <div class="form-check form-switch mb-0">
                                     <input class="form-check-input" type="checkbox"
-                                           name="ga_enabled" id="toggle_ga_enabled"
-                                           style="width:2.2em;height:1.1em;"
-                                           {{ filter_var($s['value'], FILTER_VALIDATE_BOOLEAN) ? 'checked' : '' }}>
+                                        name="ga_enabled" id="toggle_ga_enabled"
+                                        style="width:2.2em;height:1.1em;"
+                                        {{ filter_var($s['value'], FILTER_VALIDATE_BOOLEAN) ? 'checked' : '' }}>
                                 </div>
                             </div>
                         </div>
                         @endif
 
                         @foreach(['ga_measurement_id','ga_api_secret','ga_event_name'] as $gakey)
-                            @if(isset($ga[$gakey]))
-                            @php $s = $ga[$gakey] @endphp
-                            <div class="col-md-4">
-                                <label class="form-label fw-600 small text-dark mb-1">{{ $s['label'] }}</label>
-                                <input type="{{ $gakey === 'ga_api_secret' ? 'password' : 'text' }}"
-                                       class="form-control form-control-sm" name="{{ $gakey }}"
-                                       value="{{ $s['value'] }}" autocomplete="off"
-                                       placeholder="{{ $gakey === 'ga_measurement_id' ? 'G-XXXXXXXXXX' : '' }}">
-                            </div>
-                            @endif
+                        @if(isset($ga[$gakey]))
+                        @php $s = $ga[$gakey] @endphp
+                        <div class="col-md-4">
+                            <label class="form-label fw-600 small text-dark mb-1">{{ $s['label'] }}</label>
+                            <input type="{{ $gakey === 'ga_api_secret' ? 'password' : 'text' }}"
+                                class="form-control form-control-sm" name="{{ $gakey }}"
+                                value="{{ $s['value'] }}" autocomplete="off"
+                                placeholder="{{ $gakey === 'ga_measurement_id' ? 'G-XXXXXXXXXX' : '' }}">
+                        </div>
+                        @endif
                         @endforeach
                     </div>
                 </div>
@@ -186,7 +186,7 @@
                 <div class="card p-3">
                     <div class="d-flex align-items-center gap-2 mb-3">
                         <span class="rounded bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center"
-                              style="width:32px;height:32px;">
+                            style="width:32px;height:32px;">
                             <i class="bi bi-code-slash text-secondary"></i>
                         </span>
                         <div>
