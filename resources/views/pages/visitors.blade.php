@@ -55,9 +55,9 @@
                                     <small class="text-secondary">{{ $visitor->country_name ?: 'Unknown' }}</small>
                                 </td>
                                 <td>
-                                    <small class="d-block text-primary fw-600" title="{{ $visitor->visit_url }}">{{ Str::limit($visitor->visit_url, 25) }}</small>
+                                    <small class="d-block text-primary fw-600" title="{{ $visitor->visit_url }}">{{ str($visitor->visit_url)->limit(25) }}</small>
                                     @if($visitor->referral_url)
-                                        <small class="text-secondary d-none d-md-block" style="font-size: 0.7rem;" title="{{ $visitor->referral_url }}">via {{ Str::limit($visitor->referral_url, 20) }}</small>
+                                        <small class="text-secondary d-none d-md-block" style="font-size: 0.7rem;" title="{{ $visitor->referral_url }}">via {{ str($visitor->referral_url)->limit(20) }}</small>
                                     @endif
                                 </td>
                                 <td class="text-center">
