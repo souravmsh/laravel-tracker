@@ -52,8 +52,8 @@
                                     </td>
                                     <td>
                                         <div class="d-flex flex-column">
-                                            <span class="fw-600 text-dark small">{{ Str::limit($referral->title, 20) }}</span>
-                                            <small class="text-secondary d-none d-sm-block" style="font-size: 0.7rem;">{{ Str::limit($referral->description, 30) }}</small>
+                                            <span class="fw-600 text-dark small">{{ str($referral->title)->limit(20) }}</span>
+                                            <small class="text-secondary d-none d-sm-block" style="font-size: 0.7rem;">{{ str($referral->description)->limit(30) }}</small>
                                         </div>
                                     </td>
                                     <td class="text-center">
