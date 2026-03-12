@@ -106,7 +106,7 @@
                             <div class="d-flex align-items-center justify-content-between p-2 rounded border bg-light bg-opacity-50">
                                 <div>
                                     <div class="fw-600 text-dark small">{{ $s['label'] }}</div>
-                                    <small class="text-secondary" style="font-size: 0.7rem;">{{ Str::limit($s['description'], 50) }}</small>
+                                    <small class="text-secondary" style="font-size: 0.7rem;">{{ str($s['description'])->limit(50) }}</small>
                                 </div>
                                 <div class="form-check form-switch mb-0">
                                     <input class="form-check-input" type="checkbox"
@@ -153,7 +153,7 @@
                                 style="background: rgba(234,67,53,0.03); border-color: rgba(234,67,53,0.1) !important;">
                                 <div>
                                     <div class="fw-600 text-dark small">{{ $s['label'] }}</div>
-                                    <small class="text-secondary" style="font-size: 0.7rem;">{{ Str::limit($s['description'], 60) }}</small>
+                                    <small class="text-secondary" style="font-size: 0.7rem;">{{ str($s['description'])->limit(60) }}</small>
                                 </div>
                                 <div class="form-check form-switch mb-0">
                                     <input class="form-check-input" type="checkbox"
