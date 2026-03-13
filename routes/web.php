@@ -7,7 +7,7 @@ Route::prefix(config("tracker.routes.prefix", "tracker"))
     ->middleware(config("tracker.routes.middleware", ["web", "tracker"]))
     ->name("tracker.")
     ->group(function () {
-        Route::get("/", [TrackerWebController::class, "dashboard"])->name("dashboard");
+        Route::get("/", [TrackerWebController::class, "dashboard"])->name("home");
         Route::get("dashboard", [TrackerWebController::class, "dashboard"])->name("dashboard");
         Route::get("visitors", [TrackerWebController::class, "visitors"])->name("visitors");
         Route::get("referrals", [TrackerWebController::class, "referrals"])->name("referrals");
