@@ -32,8 +32,8 @@
                             <i class="bi bi-toggles2 text-primary"></i>
                         </span>
                         <div>
-                            <h5 class="fw-700 h6 mb-0">General</h5>
-                            <small class="text-secondary" style="font-size: 0.75rem;">Core tracking behaviour</small>
+                            <h5 class="fw-700 h6 mb-0 text-white">General</h5>
+                            <small class="text-white-50" style="font-size: 0.75rem;">Core tracking behaviour</small>
                         </div>
                     </div>
 
@@ -44,10 +44,10 @@
                             @if(isset($g[$bkey]))
                             @php $s = $g[$bkey] @endphp
                             <div class="col-md-6">
-                                <div class="d-flex align-items-center justify-content-between p-2 rounded border bg-light bg-opacity-50">
+                                <div class="d-flex align-items-center justify-content-between p-2 rounded border bg-secondary bg-opacity-10">
                                     <div>
-                                        <div class="fw-600 text-dark small">{{ $s['label'] }}</div>
-                                        <small class="text-secondary" style="font-size: 0.7rem;">{{ str($s['description'])->limit(50) }}</small>
+                                        <div class="fw-600 text-white small">{{ $s['label'] }}</div>
+                                        <small class="text-white-50" style="font-size: 0.7rem;">{{ str($s['description'])->limit(50) }}</small>
                                     </div>
                                     <div class="form-check form-switch mb-0">
                                         <input class="form-check-input" type="checkbox"
@@ -64,8 +64,8 @@
                             @if(isset($g[$ikey]))
                             @php $s = $g[$ikey] @endphp
                             <div class="col-md-3">
-                                <label class="form-label fw-600 small text-muted mb-1 mono" style="font-size: 0.65rem">{{ strtoupper(str_replace(' ', '_', $s['label'])) }}</label>
-                                <input type="number" class="form-control form-control-sm mono bg-dark text-main border-secondary" name="{{ $ikey }}"
+                                <label class="form-label fw-600 small text-white-50 mb-1 mono" style="font-size: 0.65rem">{{ strtoupper(str_replace(' ', '_', $s['label'])) }}</label>
+                                <input type="number" class="form-control form-control-sm mono bg-transparent text-white border-secondary" name="{{ $ikey }}"
                                        value="{{ $s['value'] }}" min="0" style="font-size: 0.75rem;">
                             </div>
                             @endif
@@ -74,10 +74,10 @@
                         @if(isset($g['title']))
                             @php $s = $g['title'] @endphp
                             <div class="col-md-12">
-                                <label class="form-label fw-600 small text-muted mb-1 mono" style="font-size: 0.65rem">{{ strtoupper(str_replace(' ', '_', $s['label'])) }}</label>
-                                <input type="text" class="form-control form-control-sm mono bg-dark text-main border-secondary" name="title"
+                                <label class="form-label fw-600 small text-white-50 mb-1 mono" style="font-size: 0.65rem">{{ strtoupper(str_replace(' ', '_', $s['label'])) }}</label>
+                                <input type="text" class="form-control form-control-sm mono bg-transparent text-white border-secondary" name="title"
                                        value="{{ $s['value'] }}" style="font-size: 0.75rem;">
-                                <div class="form-text text-muted mono" style="font-size: 0.6rem;">{{ $s['description'] }}</div>
+                                <div class="form-text text-white-50 mono" style="font-size: 0.6rem;">{{ $s['description'] }}</div>
                             </div>
                         @endif
                     </div>
@@ -93,8 +93,8 @@
                             <i class="bi bi-geo-alt text-primary"></i>
                         </span>
                         <div>
-                            <h5 class="fw-700 h6 mb-0">IP Geolocation</h5>
-                            <small class="text-secondary" style="font-size: 0.75rem;">Powered by <a href="https://ipapi.co" target="_blank" class="text-primary text-decoration-none">ipapi.co</a></small>
+                            <h5 class="fw-700 h6 mb-0 text-white">IP Geolocation</h5>
+                            <small class="text-white-50" style="font-size: 0.75rem;">Powered by <a href="https://ipapi.co" target="_blank" class="text-primary text-decoration-none">ipapi.co</a></small>
                         </div>
                     </div>
 
@@ -103,10 +103,10 @@
                         @if(isset($ip['ip_api_enabled']))
                         @php $s = $ip['ip_api_enabled'] @endphp
                         <div class="col-md-6">
-                            <div class="d-flex align-items-center justify-content-between p-2 rounded border bg-light bg-opacity-50">
+                            <div class="d-flex align-items-center justify-content-between p-2 rounded border bg-secondary bg-opacity-10">
                                 <div>
-                                    <div class="fw-600 text-dark small">{{ $s['label'] }}</div>
-                                    <small class="text-secondary" style="font-size: 0.7rem;">{{ str($s['description'])->limit(50) }}</small>
+                                    <div class="fw-600 text-white small">{{ $s['label'] }}</div>
+                                    <small class="text-white-50" style="font-size: 0.7rem;">{{ str($s['description'])->limit(50) }}</small>
                                 </div>
                                 <div class="form-check form-switch mb-0">
                                     <input class="form-check-input" type="checkbox"
@@ -121,8 +121,8 @@
                         @if(isset($ip['ip_api_token']))
                         @php $s = $ip['ip_api_token'] @endphp
                         <div class="col-md-6">
-                            <label class="form-label fw-600 small text-dark mb-1">{{ $s['label'] }}</label>
-                            <input type="password" class="form-control form-control-sm" name="ip_api_token"
+                            <label class="form-label fw-600 small text-white-50 mb-1">{{ $s['label'] }}</label>
+                            <input type="password" class="form-control form-control-sm bg-transparent text-white border-secondary" name="ip_api_token"
                                    value="{{ $s['value'] }}" autocomplete="off">
                         </div>
                         @endif
@@ -139,8 +139,8 @@
                             <i class="bi bi-bar-chart-line text-danger"></i>
                         </span>
                         <div>
-                            <h5 class="fw-700 h6 mb-0">Google Analytics 4</h5>
-                            <small class="text-secondary" style="font-size: 0.75rem;">Measurement Protocol</small>
+                            <h5 class="fw-700 h6 mb-0 text-white">Google Analytics 4</h5>
+                            <small class="text-white-50" style="font-size: 0.75rem;">Measurement Protocol</small>
                         </div>
                     </div>
 
@@ -152,8 +152,8 @@
                             <div class="d-flex align-items-center justify-content-between p-2 rounded border" 
                                  style="background: rgba(234,67,53,0.03); border-color: rgba(234,67,53,0.1) !important;">
                                 <div>
-                                    <div class="fw-600 text-dark small">{{ $s['label'] }}</div>
-                                    <small class="text-secondary" style="font-size: 0.7rem;">{{ str($s['description'])->limit(50) }}</small>
+                                    <div class="fw-600 text-white small">{{ $s['label'] }}</div>
+                                    <small class="text-white-50" style="font-size: 0.7rem;">{{ str($s['description'])->limit(50) }}</small>
                                 </div>
                                 <div class="form-check form-switch mb-0">
                                     <input class="form-check-input" type="checkbox"
@@ -169,9 +169,9 @@
                             @if(isset($ga[$gakey]))
                             @php $s = $ga[$gakey] @endphp
                             <div class="col-md-4">
-                                <label class="form-label fw-600 small text-dark mb-1">{{ $s['label'] }}</label>
+                                <label class="form-label fw-600 small text-white-50 mb-1">{{ $s['label'] }}</label>
                                 <input type="{{ $gakey === 'ga_api_secret' ? 'password' : 'text' }}"
-                                       class="form-control form-control-sm" name="{{ $gakey }}"
+                                       class="form-control form-control-sm bg-transparent text-white border-secondary" name="{{ $gakey }}"
                                        value="{{ $s['value'] }}" autocomplete="off"
                                        placeholder="{{ $gakey === 'ga_measurement_id' ? 'G-XXXXXXXXXX' : '' }}">
                             </div>
@@ -190,8 +190,8 @@
                             <i class="bi bi-code-slash text-secondary"></i>
                         </span>
                         <div>
-                            <h5 class="fw-700 h6 mb-0">Advanced & Layout</h5>
-                            <small class="text-secondary" style="font-size: 0.75rem;">Path filtering and view options</small>
+                            <h5 class="fw-700 h6 mb-0 text-white">Advanced & Layout</h5>
+                            <small class="text-white-50" style="font-size: 0.75rem;">Path filtering and view options</small>
                         </div>
                     </div>
 
@@ -199,46 +199,46 @@
                         <div class="col-md-4">
                             @if(isset($g['referral_code_params']))
                             @php $s = $g['referral_code_params'] @endphp
-                            <label class="form-label fw-600 small text-dark mb-1">{{ $s['label'] }}</label>
-                            <textarea class="form-control form-control-sm" name="referral_code_params" rows="2" style="font-size: 0.75rem;">{{ is_array($s['value']) ? json_encode($s['value']) : $s['value'] }}</textarea>
+                            <label class="form-label fw-600 small text-white-50 mb-1">{{ $s['label'] }}</label>
+                            <textarea class="form-control form-control-sm bg-transparent text-white border-secondary" name="referral_code_params" rows="2" style="font-size: 0.75rem;">{{ is_array($s['value']) ? json_encode($s['value']) : $s['value'] }}</textarea>
                             @endif
                         </div>
                         <div class="col-md-4">
                             @if(isset($g['ignore_paths']))
                             @php $s = $g['ignore_paths'] @endphp
-                            <label class="form-label fw-600 small text-dark mb-1">{{ $s['label'] }}</label>
-                            <textarea class="form-control form-control-sm" name="ignore_paths" rows="2" style="font-size: 0.75rem;">{{ is_array($s['value']) ? json_encode($s['value']) : $s['value'] }}</textarea>
+                            <label class="form-label fw-600 small text-white-50 mb-1">{{ $s['label'] }}</label>
+                            <textarea class="form-control form-control-sm bg-transparent text-white border-secondary" name="ignore_paths" rows="2" style="font-size: 0.75rem;">{{ is_array($s['value']) ? json_encode($s['value']) : $s['value'] }}</textarea>
                             @endif
                         </div>
                         <div class="col-md-4">
                             @if(isset($g['allowed_paths']))
                             @php $s = $g['allowed_paths'] @endphp
-                            <label class="form-label fw-600 small text-dark mb-1">{{ $s['label'] }}</label>
-                            <textarea class="form-control form-control-sm" name="allowed_paths" rows="2" style="font-size: 0.75rem;">{{ is_array($s['value']) ? json_encode($s['value']) : $s['value'] }}</textarea>
+                            <label class="form-label fw-600 small text-white-50 mb-1">{{ $s['label'] }}</label>
+                            <textarea class="form-control form-control-sm bg-transparent text-white border-secondary" name="allowed_paths" rows="2" style="font-size: 0.75rem;">{{ is_array($s['value']) ? json_encode($s['value']) : $s['value'] }}</textarea>
                             @endif
                         </div>
                         <div class="col-md-6">
                             @if(isset($g['layout']))
                             @php $s = $g['layout'] @endphp
-                            <label class="form-label fw-600 small text-muted mb-1 mono" style="font-size: 0.65rem">MASTER_LAYOUT</label>
-                            <input type="text" class="form-control form-control-sm mono bg-dark text-main border-secondary" name="layout" value="{{ $s['value'] }}" style="font-size: 0.75rem;">
-                            <div class="form-text text-muted mono" style="font-size: 0.6rem;">{{ $s['description'] }}</div>
+                            <label class="form-label fw-600 small text-white-50 mb-1 mono" style="font-size: 0.65rem">MASTER_LAYOUT</label>
+                            <input type="text" class="form-control form-control-sm mono bg-transparent text-white border-secondary" name="layout" value="{{ $s['value'] }}" style="font-size: 0.75rem;">
+                            <div class="form-text text-white-50 mono" style="font-size: 0.6rem;">{{ $s['description'] }}</div>
                             @endif
                         </div>
                         <div class="col-md-6">
                             @if(isset($g['route_prefix']))
                             @php $s = $g['route_prefix'] @endphp
-                            <label class="form-label fw-600 small text-muted mb-1 mono" style="font-size: 0.65rem">ROUTE_PREFIX</label>
-                            <input type="text" class="form-control form-control-sm mono bg-dark text-main border-secondary" name="route_prefix" value="{{ $s['value'] }}" style="font-size: 0.75rem;">
-                            <div class="form-text text-muted mono" style="font-size: 0.6rem;">{{ $s['description'] }}</div>
+                            <label class="form-label fw-600 small text-white-50 mb-1 mono" style="font-size: 0.65rem">ROUTE_PREFIX</label>
+                            <input type="text" class="form-control form-control-sm mono bg-transparent text-white border-secondary" name="route_prefix" value="{{ $s['value'] }}" style="font-size: 0.75rem;">
+                            <div class="form-text text-white-50 mono" style="font-size: 0.6rem;">{{ $s['description'] }}</div>
                             @endif
                         </div>
                         <div class="col-md-12">
                             @if(isset($g['route_middleware']))
                             @php $s = $g['route_middleware'] @endphp
-                            <label class="form-label fw-600 small text-muted mb-1 mono" style="font-size: 0.65rem">ROUTE_MIDDLEWARE</label>
-                            <textarea class="form-control form-control-sm mono bg-dark text-main border-secondary" name="route_middleware" rows="2" style="font-size: 0.75rem;">{{ is_array($s['value']) ? json_encode($s['value']) : $s['value'] }}</textarea>
-                            <div class="form-text text-muted mono" style="font-size: 0.6rem;">{{ $s['description'] }}</div>
+                            <label class="form-label fw-600 small text-white-50 mb-1 mono" style="font-size: 0.65rem">ROUTE_MIDDLEWARE</label>
+                            <textarea class="form-control form-control-sm mono bg-transparent text-white border-secondary" name="route_middleware" rows="2" style="font-size: 0.75rem;">{{ is_array($s['value']) ? json_encode($s['value']) : $s['value'] }}</textarea>
+                            <div class="form-text text-white-50 mono" style="font-size: 0.6rem;">{{ $s['description'] }}</div>
                             @endif
                         </div>
                     </div>
