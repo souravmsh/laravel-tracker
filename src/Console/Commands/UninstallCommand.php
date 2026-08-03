@@ -38,9 +38,13 @@ class UninstallCommand extends Command
         }
 
         try {
-            \Illuminate\Support\Facades\DB::table('migrations')
+            $deletedRows = \Illuminate\Support\Facades\DB::table('migrations')
                 ->where('migration', 'like', '%_create_tracker_%')
                 ->delete();
+            
+            if ($deletedRows > 0) {
+                $this->line("  <fg=green>✓</> Removed <fg=cyan>{$deletedRows}</> rows from migrations table");
+            }
         } catch (\Exception $e) {
             // Ignore if migrations table doesn't exist
         }
