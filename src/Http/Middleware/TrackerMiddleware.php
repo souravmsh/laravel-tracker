@@ -19,6 +19,10 @@ class TrackerMiddleware
 
     public function handle(Request $request, Closure $next)
     {
+        if (!config("tracker.enabled", true)) {
+            return $next($request);
+        }
+
         $allowedPaths = config("tracker.allowed_paths", []);
 
         // Basic exclusions
@@ -35,7 +39,7 @@ class TrackerMiddleware
         if (!empty($allowedPaths) && !$request->is($allowedPaths)) {
             return $next($request);
         }
-
+        
         if (config("tracker.enabled", true)) {
             $this->trackerMiddlewareService->track($request);
         }
