@@ -19,6 +19,10 @@ class TrackerMiddlewareService
 {
     public function track(Request $request): void
     {
+        if (!config('tracker.enabled', true)) {
+            return;
+        }
+
         try {
             // Generate or retrieve visitor ID (persistent across sessions)
             $visitorId = $this->getVisitorId($request);
@@ -81,10 +85,14 @@ class TrackerMiddlewareService
                 if (config("tracker.queue_enabled", true)) {
                     TrackerJob::dispatch($trackerData);
                 } else {
-                    TrackerLog::create($trackerData);
-                    // Dispatch geocoding immediately if sync
-                    if ($needsGeo) {
-                        event(new IpApiEvent($trackerData));
+                    try {
+                        TrackerLog::create($trackerData);
+                        // Dispatch geocoding immediately if sync
+                        if ($needsGeo) {
+                            event(new IpApiEvent($trackerData));
+                        }
+                    } catch (Exception $dbEx) {
+                        Log::warning("[LaravelTracker] Unable to write tracker log to DB: " . $dbEx->getMessage());
                     }
                 }
             }
@@ -110,15 +118,10 @@ class TrackerMiddlewareService
     {
         $visitorId = $request->cookie("tracker_visitor_id") ?? Session::get("tracker_visitor_id");
 
-        // Detect if it's encrypted junk (base64-like with eyJ... pattern)
-        if ($visitorId && !preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $visitorId)) {
-            $visitorId = null; // force regenerate
-        }
-
         if (!$visitorId) {
-            $visitorId = Str::uuid();  // binary
+            $visitorId = (string) Str::uuid();
             Session::put("tracker_visitor_id", $visitorId);
-            Cookie::queue("tracker_visitor_id", $visitorId, 60*24*365);
+            Cookie::queue("tracker_visitor_id", $visitorId, 60 * 24 * 365); // 1 year
         }
 
         return $visitorId;
@@ -146,19 +149,15 @@ class TrackerMiddlewareService
     {
         $params = config("tracker.referral_code_params", ["ref", "code", "referral_code", "_rf"]);
 
-        // 1. Check query string for new referral code
         foreach ($params as $param) {
             if ($code = $this->sanitizeInput($request->query($param))) {
                 if (preg_match('/^[a-zA-Z0-9_-]{1,50}$/', $code)) {
-                    // Update session with most recent referral code
-                    Session::put("tracker_referral_code", $code);
                     return $code;
                 }
             }
         }
 
-        // 2. Fallback to existing session code (persistence)
-        return Session::get("tracker_referral_code");
+        return null;
     }
 
     /**
