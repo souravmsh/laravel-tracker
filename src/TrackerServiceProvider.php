@@ -55,7 +55,8 @@ class TrackerServiceProvider extends ServiceProvider
         $this->app->make(TrackerSettingService::class)->mergeIntoConfig();
 
         // 4. Forcefully respect .env if you set TRACKER_ENABLED=false (overrides DB)
-        if (env('TRACKER_ENABLED') === false) {
+        $envTrackerEnabled = env('TRACKER_ENABLED');
+        if ($envTrackerEnabled !== null && filter_var($envTrackerEnabled, FILTER_VALIDATE_BOOLEAN) === false) {
             config(['tracker.enabled' => false]);
         }
 
