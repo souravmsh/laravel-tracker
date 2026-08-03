@@ -10,7 +10,7 @@ return new class extends Migration {
         // Create the table without the foreign key constraint initially
         Schema::create("tracker_logs", function (Blueprint $table) {
             $table->id();
-            $table->uuid("visitor_id")->index();
+            $table->string("visitor_id")->index();
             $table->string("referral_code", 32)->nullable()->index();
             $table->string("referral_url", 255)->nullable();
             $table->string("visit_url", 255)->nullable();
