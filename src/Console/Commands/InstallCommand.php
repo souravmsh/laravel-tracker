@@ -69,6 +69,24 @@ class InstallCommand extends Command
         // ── Run migrations ────────────────────────────────────────────────────
         $this->newLine();
         $this->line('  <fg=cyan>Running migrations…</>');
+        
+        if ($force) {
+            $this->line('  <fg=yellow>Force flag active: dropping existing tracker tables and migration records...</>');
+            $tables = ['tracker_settings', 'tracker_logs', 'tracker_referrals'];
+            foreach ($tables as $table) {
+                if (\Illuminate\Support\Facades\Schema::hasTable($table)) {
+                    \Illuminate\Support\Facades\Schema::drop($table);
+                }
+            }
+            try {
+                \Illuminate\Support\Facades\DB::table('migrations')
+                    ->where('migration', 'like', '%_create_tracker_%')
+                    ->delete();
+            } catch (\Exception $e) {
+                // Ignore if migrations table doesn't exist
+            }
+        }
+
         try {
             Artisan::call('migrate', [
                 '--path'  => 'vendor/souravmsh/laravel-tracker/database/migrations',
