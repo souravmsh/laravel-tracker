@@ -37,10 +37,34 @@ class UninstallCommand extends Command
             }
         }
 
+        try {
+            \Illuminate\Support\Facades\DB::table('migrations')
+                ->where('migration', 'like', '%_create_tracker_%')
+                ->delete();
+        } catch (\Exception $e) {
+            // Ignore if migrations table doesn't exist
+        }
+
+        // ── Remove published migrations ──────────────────────────────────────
+        $migrationsPath = database_path('migrations');
+        $deletedMigrations = 0;
+        if (is_dir($migrationsPath)) {
+            $migrationFiles = glob($migrationsPath . '/*_create_tracker_*_table.php');
+            if (is_array($migrationFiles)) {
+                foreach ($migrationFiles as $file) {
+                    @unlink($file);
+                    $deletedMigrations++;
+                }
+            }
+            if ($deletedMigrations > 0) {
+                $this->line("  <fg=green>✓</> Removed <fg=cyan>{$deletedMigrations}</> migration files");
+            }
+        }
+
         // ── Remove published config ──────────────────────────────────────────
         $configPath = config_path('tracker.php');
         if (file_exists($configPath)) {
-            unlink($configPath);
+            @unlink($configPath);
             $this->line('  <fg=green>✓</> Removed: <fg=cyan>config/tracker.php</>');
         }
 
@@ -59,8 +83,20 @@ class UninstallCommand extends Command
         }
 
         $this->newLine();
-        $this->info('  Laravel Tracker uninstalled successfully.');
-        $this->line('  <fg=gray>Remember to remove `TRACKER_*` entries from your .env file.</>');
+        $this->info('  Laravel Tracker cleanup completed.');
+
+        if ($this->confirm('<fg=yellow>Do you also want to remove the package using composer?</>', true)) {
+            $this->line('  <fg=cyan>Running composer remove souravmsh/laravel-tracker...</>');
+            exec('composer remove souravmsh/laravel-tracker 2>&1', $output, $resultCode);
+            if ($resultCode === 0) {
+                $this->line('  <fg=green>✓</> Package removed completely from Laravel via composer.');
+            } else {
+                $this->line('  <fg=red>✗</> Composer remove failed. Please run manually: `composer remove souravmsh/laravel-tracker`');
+            }
+        }
+
+        $this->newLine();
+        $this->line('  <fg=gray>Remember to remove any `TRACKER_*` entries from your .env file.</>');
         $this->newLine();
 
         return self::SUCCESS;
